@@ -1,8 +1,22 @@
 {
   "expo": {
-    "name": "expo-chat",
+    "name": "Chat",
     "slug": "expo-chat",
+    "icon": "./assets/icon.png",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "cover",
+      "backgroundColor": "#0fa958"
+    },
+    "android": {
+      "icon": "./assets/icon.png",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#0fa958"
+      }
+    },
     "version": "1.0.0",
+    "userInterfaceStyle": "automatic",
     "assetBundlePatterns": [
       "**/*"
     ]
