@@ -3,6 +3,7 @@ import { auth } from '../config/firebaseConfig'
 
 interface IAuthState {
   user: {
+    uid: string;
     email: string;
     password: string;
     isLogged: undefined | boolean;
@@ -11,6 +12,7 @@ interface IAuthState {
 
 const initialState: IAuthState = {
   user: {
+    uid: '',
     email: '',
     password: '',
     isLogged: undefined,

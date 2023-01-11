@@ -44,6 +44,7 @@ const styles = StyleSheet.create({
   },
   filledButton: {
     backgroundColor: '#0fa958',
+    elevation: 6,
   },
   linkedButton: {
     backgroundColor: 'transparent',

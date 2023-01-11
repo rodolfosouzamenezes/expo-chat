@@ -15,6 +15,7 @@ const StackRoutes = () => {
       headerShown: false,
       animation: 'fade',
       headerTintColor: '#fff',
+      headerTitleAlign: 'center',
       headerTitleStyle: {
         fontSize: 22,
       },
