@@ -4,6 +4,8 @@ export declare global {
       Preload: undefined;
       Home: undefined;
       Chats: undefined;
+      SignUp: undefined;
+      SignIn: undefined;
     }
   }
 }
