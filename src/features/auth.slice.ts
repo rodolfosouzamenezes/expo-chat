@@ -1,10 +1,20 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { auth } from '../config/firebaseConfig'
 
-const initialState = {
-  email: '',
-  password: '',
-  status: false,
+interface IAuthState {
+  user: {
+    email: string;
+    password: string;
+    isLogged: undefined | boolean;
+  }
+}
+
+const initialState: IAuthState = {
+  user: {
+    email: '',
+    password: '',
+    isLogged: undefined,
+  },
 }
 
 const authSlice = createSlice({
@@ -13,13 +23,11 @@ const authSlice = createSlice({
   reducers: {
     checkLogin: (state = initialState, action: PayloadAction<boolean>) => {
       let user = auth.currentUser;
-
-      if(user) {
-        return { ...state, state: true }
-        
+      
+      if (user) {
+        state.user.isLogged = true;
       } else {
-        
-        return { ...state, state: false }
+        state.user.isLogged = false;
       }
     }
 
@@ -29,4 +37,4 @@ const authSlice = createSlice({
 
 export const { checkLogin } = authSlice.actions;
 
-export default authSlice.reducer
+export const authReducer = authSlice.reducer;

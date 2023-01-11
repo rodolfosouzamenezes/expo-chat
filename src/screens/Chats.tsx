@@ -4,14 +4,14 @@ import { useDispatch } from "react-redux";
 
 import { useAppSelector } from "../store";
 
-export function Home() {
+export function Chats() {
   const { isLogged } = useAppSelector((state) => state.auth.user)
   const navigation = useNavigation();
   const dispatch = useDispatch();
-  
+
   return (
     <SafeAreaView>
-      <Text>Home: {String(isLogged)}</Text>
+      <Text>Chats: {String(isLogged)}</Text>
     </SafeAreaView>
   )
 }
