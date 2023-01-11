@@ -5,6 +5,9 @@ import { Button } from "../components/Button";
 import { useAppSelector } from "../store";
 import { Input } from "../components/Input";
 import { useForm } from "react-hook-form";
+import { signUp } from "../features/auth.slice";
+import { useEffect } from "react";
+import { useDispatch } from "react-redux";
 
 type FormData = {
   name: string;
@@ -17,14 +20,20 @@ export function SignUp() {
   const { email, password } = useAppSelector((state) => state.auth.user)
   const { control, handleSubmit, watch } = useForm<FormData>();
   const navigation = useNavigation();
+  const dispatch = useDispatch();
 
-  const handleSignUp = (data: FormData) => {
-    console.log(data);
+  const handleSignUp = ({email, password, name }: FormData) => {
+    dispatch(signUp({
+      name,
+      email,
+      password,
+    }))
   }
 
   return (
     <View style={styles.container}>
       <View style={styles.inputArea}>
+        <Input placeholder="Insira seu nome" title="Nome" name="name" control={control} />
         <Input placeholder="Insira seu email" title="Email" name="email" control={control} />
         <Input placeholder="Insira sua senha" title="Senha" name="password" secureTextEntry control={control} />
         <Input placeholder="Confirme a senha" title="Confirme a Senha" name="confirmPassword" secureTextEntry control={control} />
