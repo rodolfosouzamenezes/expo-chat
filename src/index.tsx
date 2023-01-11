@@ -10,8 +10,8 @@ import Routes from './routes';
 export default function App() {
   return (
     <Provider store={store}>
+      <StatusBar style="auto" translucent />
       <Routes />
-      <StatusBar style="auto" />
     </Provider>
   );
 }

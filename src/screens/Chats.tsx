@@ -1,4 +1,5 @@
-import { Text, SafeAreaView } from "react-native";
+import React from "react";
+import { Text, SafeAreaView, StyleSheet, View } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { useDispatch } from "react-redux";
 
@@ -10,8 +11,21 @@ export function Chats() {
   const dispatch = useDispatch();
 
   return (
-    <SafeAreaView>
-      <Text>Chats: {String(isLogged)}</Text>
-    </SafeAreaView>
+    <View style={{flex: 1, backgroundColor: 'red'}}>
+      <Text style={styles.title}>Chats: {String(isLogged)}</Text>
+    </View>
   )
 }
+
+const styles = StyleSheet.create({
+  container: {
+    margin: 10,
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'red'
+  }, 
+  title: {
+    fontSize: 22
+  }
+})
