@@ -5,9 +5,12 @@ import { Button } from "../components/Button";
 import { useAppSelector } from "../store";
 import { Input } from "../components/Input";
 import { useForm } from "react-hook-form";
-import { changeUid, signUp } from "../features/auth.slice";
+import { changeUser } from "../features/auth.slice";
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import { auth, firebase } from "../config/firebaseConfig";
+import { get, getDatabase, ref, set } from "firebase/database";
 
 type FormData = {
   name: string;
@@ -21,15 +24,49 @@ export function SignUp() {
   const navigation = useNavigation();
   const dispatch = useDispatch();
 
-  const handleSignUp = ({email, password, name }: FormData) => {
-    dispatch(signUp({
-      name,
-      email,
-      password,
-    }))
-    dispatch(changeUid(name))
+  const handleSignUp = async ({email, password, name }: FormData) => {
+    try {
+      createUserWithEmailAndPassword(auth, email, password)
+        .then(async (userCredential) => {
+          const user = userCredential.user;
 
-    navigation.navigate('Chats')
+          dispatch(changeUser({
+            name,
+            email,
+            uid: user.uid
+          }))
+
+
+          navigation.navigate('Chats')
+        })
+        .catch((error) => {
+          switch (error.code) {
+            case 'auth/email-already-in-use':
+              console.log('message:', error.message);
+              console.log('Já existe uma conta com este email')
+              break
+            case 'auth/invalid-email':
+              console.log('message:', error.message);
+              console.log('Email inválido')
+              break
+            case 'auth/operation-not-allowed':
+              console.log('message:', error.message);
+              console.log('Tente novamente mais tarde')
+              break
+            case 'auth/weak-password':
+              console.log('message:', error.message);
+              console.log('Senha muito fraca')
+              break
+            default:
+              console.log('error:', error.code);
+              console.log('message:', error.message);
+              break
+          }
+        });
+    } catch (error) {
+      console.log(error);
+    }
+
   }
 
   return (
