@@ -5,7 +5,7 @@ import { Button } from "../components/Button";
 import { useAppSelector } from "../store";
 import { Input } from "../components/Input";
 import { useForm } from "react-hook-form";
-import { changeUser } from "../features/auth.slice";
+import { login } from "../features/auth.slice";
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { createUserWithEmailAndPassword } from "firebase/auth";
@@ -20,7 +20,8 @@ type FormData = {
 }
 
 export function SignUp() {
-  const { isLogged } = useAppSelector((state) => state.auth.user)
+  const database = getDatabase(firebase);
+  const { isLogged } = useAppSelector((state) => state.auth)
   const { control, handleSubmit, watch } = useForm<FormData>();
   const navigation = useNavigation();
   const dispatch = useDispatch();
@@ -31,11 +32,16 @@ export function SignUp() {
         .then(async (userCredential) => {
           const user = userCredential.user;
 
-          dispatch(changeUser({
-            name,
-            email,
+          dispatch(login({
+            name: name,
+            email: user.email,
             uid: user.uid
           }))
+
+          set(ref(database, 'users/' + user.uid), { 
+            name: name,
+          })
+          .then(console.log)
         })
         .catch((error) => {
           switch (error.code) {

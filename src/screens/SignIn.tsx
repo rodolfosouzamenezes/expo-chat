@@ -5,7 +5,7 @@ import { Button } from "../components/Button";
 import { useAppSelector } from "../store";
 import { Input } from "../components/Input";
 import { useForm } from "react-hook-form";
-import { changeUser } from "../features/auth.slice";
+import { login } from "../features/auth.slice";
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { signInWithEmailAndPassword } from "firebase/auth/react-native";
@@ -18,7 +18,7 @@ type FormData = {
 }
 
 export function SignIn() {
-  const { isLogged } = useAppSelector((state) => state.auth.user)
+  const { isLogged } = useAppSelector((state) => state.auth)
   const { control, handleSubmit } = useForm<FormData>();
   const navigation = useNavigation();
   const database = getDatabase(firebase);
@@ -32,7 +32,7 @@ export function SignIn() {
         get(ref(database, 'users/' + user.uid + '/name'))
           .then(name => {
             const userName = name.val() as string;
-            dispatch(changeUser({
+            dispatch(login({
               email,
               name: userName,
               uid: user.uid,

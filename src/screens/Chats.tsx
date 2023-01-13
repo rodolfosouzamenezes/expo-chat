@@ -6,16 +6,13 @@ import { useDispatch } from "react-redux";
 import { useAppSelector } from "../store";
 
 export function Chats() {
-  const { uid } = useAppSelector((state) => state.auth.user)
+  const { isLogged, user } = useAppSelector((state) => state.auth)
   const navigation = useNavigation();
-  const dispatch = useDispatch();
-
-  console.log('oi', uid);
-  
+  const dispatch = useDispatch();  
 
   return (
     <View style={{flex: 1,}}>
-      <Text style={styles.title}>Chats: {uid}</Text>
+      <Text style={styles.title}>Chats: {user.name}</Text>
     </View>
   )
 }

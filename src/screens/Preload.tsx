@@ -1,30 +1,50 @@
-import { useEffect } from "react";
-import { Text, SafeAreaView } from "react-native";
 import { StackActions, useNavigation } from "@react-navigation/native";
+import { ActivityIndicator, SafeAreaView } from "react-native";
 import { useDispatch } from "react-redux";
+import { useEffect } from "react";
 
-import { checkLogin } from "../features/auth.slice";
+import { login } from "../features/auth.slice";
 import { useAppSelector } from "../store";
+import { auth, firebase } from "../config/firebaseConfig";
+import { get, getDatabase, ref } from "firebase/database";
+import { onAuthStateChanged } from "firebase/auth/react-native";
 
 export function Preload() {
-  const { isLogged } = useAppSelector((state) => state.auth.user)
+  const database = getDatabase(firebase);
   const navigation = useNavigation();
   const dispatch = useDispatch();
 
   useEffect(() => {
-    if (isLogged === undefined) {
-      dispatch(checkLogin())
-    } else {
-      navigation.dispatch(
-        StackActions.replace(isLogged ? 'Chats' : 'Home')
-      )
-    }
+    onAuthStateChanged(auth, user => {
+      if (user === null) {
+        navigation.dispatch(
+          StackActions.replace('Home')
+        )
+        return
+      }
+      
+      get(ref(database, 'users/' + user.uid + '/name'))
+      .then((response) => {
+        const name = response.val() as string;
+        const { uid, email } = user;
 
+        dispatch(login({
+          email: email,
+          name: name,
+          uid: uid
+        }));
+      })
+      .finally(() => {
+        navigation.dispatch(
+          StackActions.replace('Chats')
+        )
+      })
+    })
   })
-  
+
   return (
-    <SafeAreaView>
-      <Text>Is Logged: {String(isLogged)}</Text>
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#fff', justifyContent: 'center', alignItems: 'center' }}>
+      <ActivityIndicator color='#0fa958' size={40} />
     </SafeAreaView>
   )
 }
