@@ -5,7 +5,7 @@ import { Button } from "../components/Button";
 import { useAppSelector } from "../store";
 import { Input } from "../components/Input";
 import { useForm } from "react-hook-form";
-import { signUp } from "../features/auth.slice";
+import { changeUid, signUp } from "../features/auth.slice";
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
 
@@ -17,7 +17,6 @@ type FormData = {
 }
 
 export function SignUp() {
-  const { email, password } = useAppSelector((state) => state.auth.user)
   const { control, handleSubmit, watch } = useForm<FormData>();
   const navigation = useNavigation();
   const dispatch = useDispatch();
@@ -28,6 +27,9 @@ export function SignUp() {
       email,
       password,
     }))
+    dispatch(changeUid(name))
+
+    navigation.navigate('Chats')
   }
 
   return (
