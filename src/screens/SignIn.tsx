@@ -1,4 +1,4 @@
-import { Text, StyleSheet, View } from "react-native";
+import { Text, StyleSheet, View, Keyboard } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 
 import { Button } from "../components/Button";
@@ -18,6 +18,7 @@ type FormData = {
 }
 
 export function SignIn() {
+  const { isLogged } = useAppSelector((state) => state.auth.user)
   const { control, handleSubmit } = useForm<FormData>();
   const navigation = useNavigation();
   const database = getDatabase(firebase);
@@ -36,8 +37,6 @@ export function SignIn() {
               name: userName,
               uid: user.uid,
             }))
-
-            navigation.navigate('Chats')
           });
       })
       .catch((error) => {
@@ -65,7 +64,19 @@ export function SignIn() {
         }
       });
 
+
   }
+  useEffect(() => {
+    if (isLogged) {
+      Keyboard.dismiss()
+      navigation.reset({
+        index: 0,
+        routes: [
+          { name: 'Chats' },
+        ],
+      })
+    }
+  }, [isLogged])
 
   return (
     <View style={styles.container}>

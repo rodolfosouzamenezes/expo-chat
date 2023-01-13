@@ -20,11 +20,12 @@ type FormData = {
 }
 
 export function SignUp() {
+  const { isLogged } = useAppSelector((state) => state.auth.user)
   const { control, handleSubmit, watch } = useForm<FormData>();
   const navigation = useNavigation();
   const dispatch = useDispatch();
 
-  const handleSignUp = async ({email, password, name }: FormData) => {
+  const handleSignUp = async ({ email, password, name }: FormData) => {
     try {
       createUserWithEmailAndPassword(auth, email, password)
         .then(async (userCredential) => {
@@ -35,9 +36,6 @@ export function SignUp() {
             email,
             uid: user.uid
           }))
-
-
-          navigation.navigate('Chats')
         })
         .catch((error) => {
           switch (error.code) {
@@ -67,8 +65,19 @@ export function SignUp() {
       console.log(error);
     }
 
+
   }
 
+  useEffect(() => {
+    if (isLogged) {
+      navigation.reset({
+        index: 0,
+        routes: [
+          { name: 'Chats' },
+        ],
+      })
+    }
+  }, [isLogged])
   return (
     <View style={styles.container}>
       <View style={styles.inputArea}>
@@ -90,7 +99,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     justifyContent: 'space-between',
     alignItems: 'center',
-  }, 
+  },
   inputArea: {
     width: '100%',
   },
