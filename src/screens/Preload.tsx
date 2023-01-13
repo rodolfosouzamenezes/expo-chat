@@ -36,7 +36,7 @@ export function Preload() {
       })
       .finally(() => {
         navigation.dispatch(
-          StackActions.replace('Chats')
+          StackActions.replace('Tabs')
         )
       })
     })

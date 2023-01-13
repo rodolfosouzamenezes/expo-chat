@@ -3,9 +3,9 @@ export declare global {
     interface RootParamList {
       Preload: undefined;
       Home: undefined;
-      Chats: undefined;
       SignUp: undefined;
       SignIn: undefined;
+      Tabs: undefined;
     }
   }
 }

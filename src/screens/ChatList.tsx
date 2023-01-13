@@ -5,7 +5,7 @@ import { useDispatch } from "react-redux";
 
 import { useAppSelector } from "../store";
 
-export function Chats() {
+export function ChatList() {
   const { isLogged, user } = useAppSelector((state) => state.auth)
   const navigation = useNavigation();
   const dispatch = useDispatch();  
