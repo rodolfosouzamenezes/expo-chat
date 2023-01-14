@@ -11,6 +11,7 @@ import { useDispatch } from "react-redux";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { auth, firebase } from "../config/firebaseConfig";
 import { get, getDatabase, ref, set } from "firebase/database";
+import { showToast } from "../features/toast.slice";
 
 type FormData = {
   name: string;
@@ -27,51 +28,43 @@ export function SignUp() {
   const dispatch = useDispatch();
 
   const handleSignUp = async ({ email, password, name }: FormData) => {
-    try {
-      createUserWithEmailAndPassword(auth, email, password)
-        .then(async (userCredential) => {
-          const user = userCredential.user;
+    createUserWithEmailAndPassword(auth, email, password)
+      .then(async (userCredential) => {
+        const user = userCredential.user;
 
-          dispatch(login({
-            name: name,
-            email: user.email,
-            uid: user.uid
-          }))
+        dispatch(login({
+          name: name,
+          email: user.email,
+          uid: user.uid
+        }))
 
-          set(ref(database, 'users/' + user.uid), { 
-            name: name,
-          })
-          .then(console.log)
+        set(ref(database, 'users/' + user.uid), {
+          name: name,
         })
-        .catch((error) => {
-          switch (error.code) {
-            case 'auth/email-already-in-use':
-              console.log('message:', error.message);
-              console.log('Já existe uma conta com este email')
-              break
-            case 'auth/invalid-email':
-              console.log('message:', error.message);
-              console.log('Email inválido')
-              break
-            case 'auth/operation-not-allowed':
-              console.log('message:', error.message);
-              console.log('Tente novamente mais tarde')
-              break
-            case 'auth/weak-password':
-              console.log('message:', error.message);
-              console.log('Senha muito fraca')
-              break
-            default:
-              console.log('error:', error.code);
-              console.log('message:', error.message);
-              break
-          }
-        });
-    } catch (error) {
-      console.log(error);
-    }
-
-
+      })
+      .catch((error) => {
+        switch (error.code) {
+          case 'auth/email-already-in-use':
+            dispatch(showToast({ message: 'Já existe uma conta com este email!', type: 'error' }))
+            break
+          case 'auth/invalid-email':
+            dispatch(showToast({ message: 'Email inválido!', type: 'error' }))
+            break
+          case 'auth/operation-not-allowed':
+            dispatch(showToast({ message: 'Tente novamente mais tarde!', type: 'error' }))
+            break
+          case 'auth/weak-password':
+            dispatch(showToast({ message: 'Senha muito fraca!\nA senha deve ter no mínimo 6 caracteres', type: 'error' }))
+            break
+          case 'auth/missing-email':
+            dispatch(showToast({ message: 'Insira um email!', type: 'error' }))
+            break
+          default:
+            dispatch(showToast({ message: 'Ops! Ocorreu algum erro!', type: 'error' }))
+            console.log('error code:', error.code, '| message:', error.message);
+            break
+        }
+      });
   }
 
   useEffect(() => {

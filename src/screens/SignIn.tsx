@@ -1,4 +1,4 @@
-import { Text, StyleSheet, View, Keyboard } from "react-native";
+import { StyleSheet, View, Keyboard } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 
 import { Button } from "../components/Button";
@@ -11,6 +11,7 @@ import { useDispatch } from "react-redux";
 import { signInWithEmailAndPassword } from "firebase/auth/react-native";
 import { auth, firebase } from "../config/firebaseConfig";
 import { get, getDatabase, ref } from "firebase/database";
+import { showToast } from "../features/toast.slice";
 
 type FormData = {
   email: string;
@@ -37,35 +38,31 @@ export function SignIn() {
               name: userName,
               uid: user.uid,
             }))
-          });
+          })
+          .catch(console.log)    
       })
       .catch((error) => {
         switch (error.code) {
           case 'auth/user-disabled':
-            console.log('message:', error.message);
-            console.log('Usuário desabilitado')
+            dispatch(showToast({ message: 'Usuário desabilitado!', type: 'error' }))
             break
           case 'auth/invalid-email':
-            console.log('message:', error.message);
-            console.log('Email inválido')
+            dispatch(showToast({ message: 'Email e/ou senha inválidos!', type: 'error' }))
             break
           case 'auth/wrong-password':
-            console.log('message:', error.message);
-            console.log('Email e/ou senha inválidos')
+            dispatch(showToast({ message: 'Email e/ou senha inválidos!', type: 'error' }))
             break
           case 'auth/user-not-found':
-            console.log('message:', error.message);
             console.log('Email e/ou senha inválidos')
             break
           default:
-            console.log('error:', error.code);
-            console.log('message:', error.message);
+            dispatch(showToast({ message: 'Ops! Ocorreu algum erro!', type: 'error' }))
+            console.log('error code:', error.code, '| message:', error.message);
             break
         }
       });
-
-
   }
+
   useEffect(() => {
     if (isLogged) {
       Keyboard.dismiss()
