@@ -1,4 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
+import { auth } from '../config/firebaseConfig';
 
 interface IAuthState {
   user: {
@@ -43,7 +44,9 @@ const authSlice = createSlice({
       state.isLogged = true
     },
     logout: (state = initialState) => {
-      state = {} as IAuthState;
+      auth.signOut()
+      state.user = initialState.user;
+      state.isLogged = false;
     },
   }
 })

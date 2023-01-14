@@ -4,25 +4,41 @@ import { useNavigation } from "@react-navigation/native";
 import { useDispatch } from "react-redux";
 
 import { useAppSelector } from "../store";
+import { Button } from "../components/Button";
+import { logout } from "../features/auth.slice";
 
 export function Config() {
   const { isLogged, user } = useAppSelector((state) => state.auth)
   const navigation = useNavigation();
   const dispatch = useDispatch();  
 
+  const handleLogOut = () => {
+    dispatch(logout())
+    
+    navigation.reset({
+      index: 0,
+      routes: [
+        { name: 'Home' },
+      ],
+    })
+  }
+
   return (
-    <View style={{flex: 1,}}>
-      <Text style={styles.title}>Config: {user.uid}</Text>
+    <View style={styles.container}>
+      <Text style={styles.title}>UID: {user.uid}</Text>
+      <Button title="Sair" onPress={handleLogOut} />
     </View>
   )
 }
 
 const styles = StyleSheet.create({
   container: {
-    margin: 10,
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    paddingHorizontal: 24,
+    paddingVertical: 24,
+    backgroundColor: '#fff',
+    justifyContent: 'space-between',
+    alignItems: 'center'
   }, 
   title: {
     fontSize: 22
