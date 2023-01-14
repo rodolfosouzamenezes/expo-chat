@@ -10,7 +10,6 @@ import { showToast } from "../features/toast.slice";
 
 export function Config() {
   const { isLogged, user } = useAppSelector((state) => state.auth)
-  const toast = useAppSelector((state) => state.toast)
   const navigation = useNavigation();
   const dispatch = useDispatch();  
 

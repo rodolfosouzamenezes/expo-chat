@@ -1,7 +1,7 @@
 import { StyleSheet, View } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { useDispatch } from "react-redux";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { getDatabase, ref, set } from "firebase/database";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -33,7 +33,7 @@ const defaultValues: FormData = {
 const schema = yup.object({
   name: yup
     .string()
-    .min(6, "No mínimo 6 caracteres")
+    .min(2, "No mínimo 2 caracteres")
     .required("Campo obrigatório"),
   email: yup
     .string()
@@ -52,6 +52,7 @@ const schema = yup.object({
 
 export function SignUp() {
   const database = getDatabase(firebase);
+  const [isLogging, setIsLogging] = useState(false)
   const { isLogged } = useAppSelector((state) => state.auth)
   const { control, handleSubmit, formState: { errors, isValid } } = useForm<FormData>({
     resolver: yupResolver(schema),
@@ -63,6 +64,7 @@ export function SignUp() {
   const dispatch = useDispatch();
 
   const handleSignUp = async ({ email, password, name }: FormData) => {
+    setIsLogging(true)
     createUserWithEmailAndPassword(auth, email, password)
       .then(async (userCredential) => {
         const user = userCredential.user;
@@ -78,6 +80,7 @@ export function SignUp() {
         })
       })
       .catch((error) => {
+        setIsLogging(false)
         switch (error.code) {
           case 'auth/email-already-in-use':
             dispatch(showToast({ message: 'Já existe uma conta com este email!', type: 'error' }))
@@ -99,7 +102,7 @@ export function SignUp() {
             console.log('error code:', error.code, '| message:', error.message);
             break
         }
-      });
+      })
   }
 
   useEffect(() => {
@@ -110,6 +113,7 @@ export function SignUp() {
           { name: 'Tabs' },
         ],
       })
+      setTimeout(() => setIsLogging(false), 2000)
     }
   }, [isLogged])
   return (
@@ -121,7 +125,7 @@ export function SignUp() {
         <Input placeholder="Insira sua senha" title="Senha" name="password" secureTextEntry control={control}/>
         <Input placeholder="Confirme a senha" title="Confirme a Senha" name="confirmPassword" secureTextEntry control={control}/>
       </View>
-      <Button title="Enviar" onPress={handleSubmit(handleSignUp)} />
+      <Button title="Enviar" onPress={handleSubmit(handleSignUp)} isDisabled={!isValid} isLoading={isLogging}/>
     </View>
   )
 }

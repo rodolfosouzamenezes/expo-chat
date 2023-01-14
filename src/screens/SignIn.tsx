@@ -5,7 +5,7 @@ import { useNavigation } from "@react-navigation/native";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import * as yup from "yup";
 
 import { auth, firebase } from "../config/firebaseConfig";
@@ -39,6 +39,7 @@ const schema = yup.object({
 
 export function SignIn() {
   const { isLogged } = useAppSelector((state) => state.auth)
+  const [isLogging, setIsLogging] = useState(false)
   const { control, handleSubmit, formState: { isValid } } = useForm<FormData>({
     resolver: yupResolver(schema),
     mode: "onBlur",
@@ -50,6 +51,7 @@ export function SignIn() {
   const dispatch = useDispatch();
 
   const handleSignIn = ({ email, password }: FormData) => {
+    setIsLogging(true)
     signInWithEmailAndPassword(auth, email, password)
       .then(async (userCredential) => {
         const user = userCredential.user;
@@ -63,9 +65,10 @@ export function SignIn() {
               uid: user.uid,
             }))
           })
-          .catch(console.log)    
+          .catch(console.log)
       })
       .catch((error) => {
+        setIsLogging(false)
         switch (error.code) {
           case 'auth/user-disabled':
             dispatch(showToast({ message: 'Usuário desabilitado!', type: 'error' }))
@@ -77,14 +80,14 @@ export function SignIn() {
             dispatch(showToast({ message: 'Email e/ou senha inválidos!', type: 'error' }))
             break
           case 'auth/user-not-found':
-            console.log('Email e/ou senha inválidos')
+            dispatch(showToast({ message: 'Email e/ou senha inválidos!', type: 'error' }))
             break
           default:
             dispatch(showToast({ message: 'Ops! Ocorreu algum erro!', type: 'error' }))
             console.log('error code:', error.code, '| message:', error.message);
             break
         }
-      });
+      })
   }
 
   useEffect(() => {
@@ -96,6 +99,7 @@ export function SignIn() {
           { name: 'Tabs' },
         ],
       })
+      setTimeout(() => setIsLogging(false), 2000)
     }
   }, [isLogged])
 
@@ -105,7 +109,7 @@ export function SignIn() {
         <Input placeholder="Insira seu email" title="Email" name="email" control={control} />
         <Input placeholder="Insira sua senha" title="Senha" name="password" secureTextEntry control={control} />
       </View>
-      <Button title="Enviar" onPress={handleSubmit(handleSignIn)} />
+      <Button title="Enviar" onPress={handleSubmit(handleSignIn)} isDisabled={!isValid} isLoading={isLogging} />
     </View>
   )
 }

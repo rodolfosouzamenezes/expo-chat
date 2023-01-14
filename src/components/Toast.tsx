@@ -53,18 +53,18 @@ export function Toast() {
 
     timer = setTimeout(() => {
       hide()
-      setStatusBarStyle('light')
     }, toastState.duration)
   }
 
   const hide = () => {
     Animated.timing(position, {
-      toValue: -(Constants.statusBarHeight + 60),
+      toValue: -(Constants.statusBarHeight + 70),
       useNativeDriver: true,
       duration: 200,
       easing: Easing.linear,
     }).start(() => {
       dispatch(hideToast())
+      setStatusBarStyle('light')
     });
   }
 
@@ -75,7 +75,13 @@ export function Toast() {
   return (
     <View style={{ ...zIndex(100) }}>
       <StatusBar style={statusBarStyle} translucent />
-      <TouchableWithoutFeedback>
+      <TouchableWithoutFeedback 
+        onPress={() => {
+          clearTimeout(timer)
+          dispatch(hideToast())
+          hide()
+        }}
+      >
         <Animated.View style={[styles.default, { backgroundColor: colors[toastState.type], transform:[{translateY: position}] }]}>
           <View style={styles.messageContainer}>
             <Ionicons name={toastState.iconName || iconName[toastState.type]} color='white' size={26} />
