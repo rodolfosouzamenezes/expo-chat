@@ -14,7 +14,10 @@ const colors = {
   info: '#1285f1',
   default: '#817f7f',
 }
-const iconName = {
+
+type IconNameKeys = {[type: string]: keyof typeof Ionicons.glyphMap}
+
+const iconName: IconNameKeys= {
   success: 'checkmark-circle-outline',
   error: 'close-circle-outline',
   warn: 'alert-circle-outline',
@@ -28,8 +31,8 @@ export function Toast() {
   const deviceTheme = useColorScheme();
   const [statusBarStyle, setStatusBarStyle] = useState<'dark' | 'light'>('light');
   const [position] = useState(new Animated.Value(-(Constants.statusBarHeight + 60)));
-  const dispatch = useDispatch();
   const toastState = useAppSelector((state) => state.toast)
+  const dispatch = useDispatch();
 
   const zIndex = (value: number) => {
     return Platform.select({
@@ -50,7 +53,7 @@ export function Toast() {
 
     timer = setTimeout(() => {
       hide()
-      setStatusBarStyle('dark')
+      setStatusBarStyle('light')
     }, toastState.duration)
   }
 
@@ -64,7 +67,6 @@ export function Toast() {
       dispatch(hideToast())
     });
   }
-
 
   useEffect(() => {
     toastState.show && show();
