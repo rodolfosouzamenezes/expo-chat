@@ -29,6 +29,7 @@ const defaultValues: FormData = {
 const schema = yup.object({
   email: yup
     .string()
+    .trim()
     .email("E-mail inválido")
     .required("Campo obrigatório"),
   password: yup

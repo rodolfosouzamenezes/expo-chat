@@ -38,6 +38,7 @@ const schema = yup.object({
   email: yup
     .string()
     .email("E-mail inválido")
+    .trim()
     .required("Campo obrigatório"),
   password: yup
     .string()
