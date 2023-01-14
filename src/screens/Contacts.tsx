@@ -1,18 +1,45 @@
-import React from "react";
-import { Text, SafeAreaView, StyleSheet, View } from "react-native";
-import { useNavigation } from "@react-navigation/native";
+import React, { useCallback, useEffect } from "react";
+import { Text, SafeAreaView, StyleSheet, View, FlatList } from "react-native";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { useDispatch } from "react-redux";
 
 import { useAppSelector } from "../store";
+import { get, getDatabase, ref } from "firebase/database";
+import { firebase } from "../config/firebaseConfig";
+import { IContact, setContacts } from "../features/chat.slice";
 
 export function Contacts() {
-  const { isLogged, user } = useAppSelector((state) => state.auth)
+  const { contacts } = useAppSelector((state) => state.chat)
   const navigation = useNavigation();
-  const dispatch = useDispatch();  
+  const database = getDatabase(firebase);
+  const dispatch = useDispatch();
+
+  const getContacts = async () => {
+    let contacts: IContact[] = [];
+    await get(ref(database, 'users/'))
+      .then((usersResponse) => {
+        usersResponse.forEach((user) => {
+          const name = user.val().name as string;
+          const id = user.key;
+          contacts.push({ name, id })          
+        })
+      });
+
+    dispatch(setContacts(contacts))
+  }
+
+  useFocusEffect(useCallback(() => {
+    getContacts()
+  }, []))
 
   return (
-    <View style={{flex: 1,}}>
-      <Text style={styles.title}>Contacts: {user.email}</Text>
+    <View style={{ flex: 1, }}>
+      <FlatList
+        data={contacts}
+        renderItem={({item}) => {
+          return <Text>{item.name}</Text>
+        }}
+      />
     </View>
   )
 }
@@ -23,7 +50,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-  }, 
+  },
   title: {
     fontSize: 22
   }
