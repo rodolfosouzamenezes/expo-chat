@@ -1,26 +1,50 @@
+import { signInWithEmailAndPassword } from "firebase/auth/react-native";
+import { get, getDatabase, ref } from "firebase/database";
 import { StyleSheet, View, Keyboard } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-
-import { Button } from "../components/Button";
-import { useAppSelector } from "../store";
-import { Input } from "../components/Input";
+import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm } from "react-hook-form";
-import { login } from "../features/auth.slice";
-import { useEffect } from "react";
 import { useDispatch } from "react-redux";
-import { signInWithEmailAndPassword } from "firebase/auth/react-native";
+import { useEffect } from "react";
+import * as yup from "yup";
+
 import { auth, firebase } from "../config/firebaseConfig";
-import { get, getDatabase, ref } from "firebase/database";
+import { useAppSelector } from "../store";
 import { showToast } from "../features/toast.slice";
+
+import { login } from "../features/auth.slice";
+import { Button } from "../components/Button";
+import { Input } from "../components/Input";
 
 type FormData = {
   email: string;
   password: string;
 }
 
+const defaultValues: FormData = {
+  email: '',
+  password: '',
+}
+
+const schema = yup.object({
+  email: yup
+    .string()
+    .email("E-mail inválido")
+    .required("Campo obrigatório"),
+  password: yup
+    .string()
+    .min(6, "No mínimo 6 caracteres")
+    .required("Campo obrigatório"),
+}).required();
+
 export function SignIn() {
   const { isLogged } = useAppSelector((state) => state.auth)
-  const { control, handleSubmit } = useForm<FormData>();
+  const { control, handleSubmit, formState: { isValid } } = useForm<FormData>({
+    resolver: yupResolver(schema),
+    mode: "onBlur",
+    defaultValues,
+    reValidateMode: "onChange",
+  });
   const navigation = useNavigation();
   const database = getDatabase(firebase);
   const dispatch = useDispatch();

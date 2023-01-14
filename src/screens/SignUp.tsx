@@ -1,17 +1,20 @@
-import { Text, StyleSheet, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-
-import { Button } from "../components/Button";
-import { useAppSelector } from "../store";
-import { Input } from "../components/Input";
-import { useForm } from "react-hook-form";
-import { login } from "../features/auth.slice";
-import { useEffect } from "react";
 import { useDispatch } from "react-redux";
+import { useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { getDatabase, ref, set } from "firebase/database";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as yup from "yup";
+
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { auth, firebase } from "../config/firebaseConfig";
-import { get, getDatabase, ref, set } from "firebase/database";
 import { showToast } from "../features/toast.slice";
+import { useAppSelector } from "../store";
+import { login } from "../features/auth.slice";
+
+import { Button } from "../components/Button";
+import { Input } from "../components/Input";
 
 type FormData = {
   name: string;
@@ -20,10 +23,42 @@ type FormData = {
   confirmPassword: string;
 }
 
+const defaultValues: FormData = {
+  name: '',
+  email: '',
+  password: '',
+  confirmPassword: '',
+}
+
+const schema = yup.object({
+  name: yup
+    .string()
+    .min(6, "No mínimo 6 caracteres")
+    .required("Campo obrigatório"),
+  email: yup
+    .string()
+    .email("E-mail inválido")
+    .required("Campo obrigatório"),
+  password: yup
+    .string()
+    .min(6, "No mínimo 6 caracteres")
+    .required("Campo obrigatório"),
+  confirmPassword: yup
+    .string()
+    .min(6, "No mínimo 6 caracteres")
+    .required("Campo obrigatório")
+    .oneOf([yup.ref('password'), null], 'As senhas não conferem')
+}).required();
+
 export function SignUp() {
   const database = getDatabase(firebase);
   const { isLogged } = useAppSelector((state) => state.auth)
-  const { control, handleSubmit, watch } = useForm<FormData>();
+  const { control, handleSubmit, formState: { errors, isValid } } = useForm<FormData>({
+    resolver: yupResolver(schema),
+    mode: "onBlur",
+    defaultValues,
+    reValidateMode: "onChange",
+  });
   const navigation = useNavigation();
   const dispatch = useDispatch();
 
@@ -81,9 +116,10 @@ export function SignUp() {
     <View style={styles.container}>
       <View style={styles.inputArea}>
         <Input placeholder="Insira seu nome" title="Nome" name="name" control={control} />
-        <Input placeholder="Insira seu email" title="Email" name="email" control={control} />
-        <Input placeholder="Insira sua senha" title="Senha" name="password" secureTextEntry control={control} />
-        <Input placeholder="Confirme a senha" title="Confirme a Senha" name="confirmPassword" secureTextEntry control={control} />
+
+        <Input placeholder="Insira seu email" title="Email" name="email" control={control}/>
+        <Input placeholder="Insira sua senha" title="Senha" name="password" secureTextEntry control={control}/>
+        <Input placeholder="Confirme a senha" title="Confirme a Senha" name="confirmPassword" secureTextEntry control={control}/>
       </View>
       <Button title="Enviar" onPress={handleSubmit(handleSignUp)} />
     </View>

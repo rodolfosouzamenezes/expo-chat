@@ -4,7 +4,6 @@ import { StyleSheet } from "react-native";
 import React, { useState } from "react";
 import { Ionicons } from '@expo/vector-icons/';
 
-
 export interface IInputProps extends TextInputProps {
   title: string;
   placeholder: string;
@@ -40,7 +39,7 @@ export function Input({ placeholder, title, name, control, rules, secureTextEntr
               {...rest}
             />
 
-            {error && <Text>{error.message || 'Ops! Algo deu errado'}</Text>}
+            {error && <Text style={styles.errorMessage}>{error.message || 'Ops! Algo deu errado'}</Text>}
           </View>
         )}
 
@@ -73,6 +72,10 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     backgroundColor: '#f2f2f2',
     fontSize: 16,
+  },
+  errorMessage: {
+    fontSize: 12,
+    color: '#d32f2f',
   },
   passwordButton: {
     width: 'auto',
