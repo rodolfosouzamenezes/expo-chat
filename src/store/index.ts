@@ -3,11 +3,13 @@ import { TypedUseSelectorHook, useSelector } from "react-redux";
 
 import { authReducer } from "../features/auth.slice";
 import { chatReducer } from "../features/chat.slice";
+import { toastReducer } from "../features/toast.slice";
 
 export const store = configureStore({
   reducer: {
     auth: authReducer,
     chat: chatReducer,
+    toast: toastReducer,
   }
 });
 
