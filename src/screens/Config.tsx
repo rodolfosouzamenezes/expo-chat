@@ -28,11 +28,6 @@ export function Config() {
     <View style={styles.container}>
       <Text style={styles.title}>UID: {user.uid}</Text>
       <Button title="Sair" onPress={handleLogOut} />
-      <Button title="Toast" onPress={() => dispatch(showToast({message: 'olsdad', type: 'success'}))} />
-      <Button title="Toast" onPress={() => dispatch(showToast({message: 'olsdad', type: 'default'}))} />
-      <Button title="Toast" onPress={() => dispatch(showToast({message: 'olsdad', type: 'error'}))} />
-      <Button title="Toast" onPress={() => dispatch(showToast({message: 'olsdad', type: 'info'}))} />
-      <Button title="Toast" onPress={() => dispatch(showToast({message: 'olsdad', type: 'warn', iconName:'add'}))} />
     </View>
   )
 }
