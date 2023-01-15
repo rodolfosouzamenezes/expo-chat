@@ -7,6 +7,7 @@ import { useAppSelector } from "../store";
 import { get, getDatabase, ref } from "firebase/database";
 import { firebase } from "../config/firebaseConfig";
 import { IContact, setContacts } from "../features/chat.slice";
+import { ContactItem } from "../components/ContactItem";
 
 export function Contacts() {
   const { contacts } = useAppSelector((state) => state.chat)
@@ -28,6 +29,10 @@ export function Contacts() {
     dispatch(setContacts(contacts))
   }
 
+  const handleContactPress = (id: string) => {
+    console.log(id);   
+  }
+
   useFocusEffect(useCallback(() => {
     getContacts()
   }, []))
@@ -37,7 +42,7 @@ export function Contacts() {
       <FlatList
         data={contacts}
         renderItem={({item}) => {
-          return <Text>{item.name}</Text>
+          return <ContactItem data={item} onPress={handleContactPress}/>
         }}
       />
     </View>
