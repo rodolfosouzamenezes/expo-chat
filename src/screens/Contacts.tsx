@@ -4,7 +4,7 @@ import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { useDispatch } from "react-redux";
 
 import { useAppSelector } from "../store";
-import { get, getDatabase, ref, orderByChild, query, orderByValue } from "firebase/database";
+import { get, getDatabase, push, ref, orderByChild, query, orderByValue, set } from "firebase/database";
 import { firebase } from "../config/firebase";
 import { IContact, setContacts } from "../features/chat.slice";
 import { ContactItem } from "../components/ContactItem";
@@ -48,8 +48,25 @@ export function Contacts() {
     dispatch(setContacts(contacts))
   }
 
-  const handleContactPress = (id: string) => {
-    console.log(id);
+  const handleContactPress = async (id: string) => {
+    const newChat = await push(ref(database, 'chats'));
+    const newChatId = newChat.key;
+    set(newChat, {  
+      members: {
+        [uid]: { id: uid,},
+        [id]: { id }
+      }
+    })
+
+    set(ref(database, `users/${uid}/chats`), {
+      [newChatId]: { id: newChatId }
+    })
+    set(ref(database, `users/${id}/chats`), {
+      [newChatId]: { id: newChatId }
+    })
+
+
+
   }
 
   useFocusEffect(useCallback(() => {
