@@ -7,8 +7,7 @@ import { getDatabase, ref, set } from "firebase/database";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 
-import { createUserWithEmailAndPassword } from "firebase/auth";
-import { auth, firebase } from "../config/firebaseConfig";
+import { auth, createUserWithEmailAndPassword, firebase } from "../config/firebase";
 import { showToast } from "../features/toast.slice";
 import { useAppSelector } from "../store";
 import { login } from "../features/auth.slice";

@@ -1,4 +1,3 @@
-import { signInWithEmailAndPassword } from "firebase/auth/react-native";
 import { get, getDatabase, ref } from "firebase/database";
 import { StyleSheet, View, Keyboard } from "react-native";
 import { useNavigation } from "@react-navigation/native";
@@ -8,7 +7,7 @@ import { useDispatch } from "react-redux";
 import { useEffect, useState } from "react";
 import * as yup from "yup";
 
-import { auth, firebase } from "../config/firebaseConfig";
+import { auth, firebase, signInWithEmailAndPassword } from "../config/firebase";
 import { useAppSelector } from "../store";
 import { showToast } from "../features/toast.slice";
 

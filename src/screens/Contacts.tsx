@@ -5,7 +5,7 @@ import { useDispatch } from "react-redux";
 
 import { useAppSelector } from "../store";
 import { get, getDatabase, ref } from "firebase/database";
-import { firebase } from "../config/firebaseConfig";
+import { firebase } from "../config/firebase";
 import { IContact, setContacts } from "../features/chat.slice";
 import { ContactItem } from "../components/ContactItem";
 

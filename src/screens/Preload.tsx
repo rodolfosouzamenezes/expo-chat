@@ -4,10 +4,8 @@ import { useDispatch } from "react-redux";
 import { useEffect } from "react";
 
 import { login } from "../features/auth.slice";
-import { useAppSelector } from "../store";
-import { auth, firebase } from "../config/firebaseConfig";
+import { auth, firebase, onAuthStateChanged } from "../config/firebase";
 import { get, getDatabase, ref } from "firebase/database";
-import { onAuthStateChanged } from "firebase/auth/react-native";
 
 export function Preload() {
   const database = getDatabase(firebase);
