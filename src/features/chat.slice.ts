@@ -1,15 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 
-interface IChatState {
-  chats: IChat[];
-  contacts: IContact[];
-}
-
-const initialState: IChatState = {
-  chats: [],
-  contacts: [],
-}
-
 export interface IContact {
   id: string;
   name: string;
@@ -17,7 +7,17 @@ export interface IContact {
 
 interface IChat {
   id: string;
-  name: string;
+}
+interface IChatState {
+  chats: IChat[];
+  contacts: IContact[];
+  activeChat: string;
+}
+
+const initialState: IChatState = {
+  chats: [],
+  contacts: [],
+  activeChat: null,
 }
 
 const chatSlice = createSlice({
@@ -27,8 +27,11 @@ const chatSlice = createSlice({
     setContacts: (state = initialState, action: PayloadAction<IContact[]>) => {
       state.contacts = [...action.payload]
     },
+    setActiveChat: (state = initialState, action: PayloadAction<{ chatId: string }>) => {
+      state.activeChat = action.payload.chatId
+    },
   }
 })
 
-export const { setContacts } = chatSlice.actions;
+export const { setContacts, setActiveChat } = chatSlice.actions;
 export const chatReducer = chatSlice.reducer;

@@ -3,7 +3,6 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 import { Preload } from '../screens/Preload';
 import { Home } from '../screens/Home';
-import { ChatList } from '../screens/ChatList';
 import { SignIn } from '../screens/SignIn';
 import { SignUp } from '../screens/SignUp';
 import TabRoutes from './tab.routes';

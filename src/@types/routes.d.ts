@@ -5,6 +5,8 @@ export declare global {
       Home: undefined;
       SignUp: undefined;
       SignIn: undefined;
+      ChatStack: undefined;
+      Chat: undefined;
       Tabs: undefined;
     }
   }

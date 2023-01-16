@@ -6,7 +6,7 @@ import { useDispatch } from "react-redux";
 import { useAppSelector } from "../store";
 import { get, getDatabase, push, ref, orderByChild, query, orderByValue, set } from "firebase/database";
 import { firebase } from "../config/firebase";
-import { IContact, setContacts } from "../features/chat.slice";
+import { IContact, setActiveChat, setContacts } from "../features/chat.slice";
 import { ContactItem } from "../components/ContactItem";
 
 export function Contacts() {
@@ -65,8 +65,9 @@ export function Contacts() {
       [newChatId]: { id: newChatId }
     })
 
+    dispatch(setActiveChat({ chatId: newChatId }))
 
-
+    navigation.navigate('ChatStack')
   }
 
   useFocusEffect(useCallback(() => {
