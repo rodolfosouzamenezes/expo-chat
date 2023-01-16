@@ -9,7 +9,7 @@ const { Screen, Navigator } = createNativeStackNavigator();
 const ChatStackRoutes = () => {
   return (
     <Navigator
-      initialRouteName='ChatList' 
+      initialRouteName='ChatList'
       screenOptions={{
         headerShown: false,
         animation: 'fade_from_bottom',

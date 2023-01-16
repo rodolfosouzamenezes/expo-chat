@@ -29,7 +29,7 @@ const StackRoutes = () => {
       <Screen name="Home" component={Home} />
       <Screen name="SignIn" component={SignIn} options={{ headerShown: true, title: 'Entrar' }} />
       <Screen name="SignUp" component={SignUp} options={{ headerShown: true, title: 'Cadastrar' }} />
-      <Screen name="Tabs" component={TabRoutes} />
+      <Screen name="Tabs" component={TabRoutes}  />
     </Navigator>
   )
 }
