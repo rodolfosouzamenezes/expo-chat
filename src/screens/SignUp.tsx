@@ -1,8 +1,8 @@
-import { StyleSheet, View } from "react-native";
+import { Dimensions, KeyboardAvoidingView, Platform, ScrollView, ScrollViewComponent, StyleSheet, View } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { useDispatch } from "react-redux";
 import { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
+import { useController, useForm } from "react-hook-form";
 import { getDatabase, ref, set } from "firebase/database";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
@@ -32,21 +32,19 @@ const defaultValues: FormData = {
 const schema = yup.object({
   name: yup
     .string()
-    .min(2, "No mínimo 2 caracteres")
+    .min(2, "Deve ter no mínimo 2 caracteres")
     .required("Campo obrigatório"),
   email: yup
     .string()
-    .email("E-mail inválido")
+    .email("O email deve ser válido")
     .trim()
-    .required("Campo obrigatório"),
+    .required("Este campo é obrigatório"),
   password: yup
     .string()
-    .min(6, "No mínimo 6 caracteres")
-    .required("Campo obrigatório"),
+    .min(6, "Deve ter no mínimo 6 caracteres")
+    .required("Este campo é obrigatório"),
   confirmPassword: yup
     .string()
-    .min(6, "No mínimo 6 caracteres")
-    .required("Campo obrigatório")
     .oneOf([yup.ref('password'), null], 'As senhas não conferem')
 }).required();
 
@@ -54,11 +52,10 @@ export function SignUp() {
   const database = getDatabase(firebase);
   const [isLogging, setIsLogging] = useState(false)
   const { isLogged } = useAppSelector((state) => state.auth)
-  const { control, handleSubmit, formState: { errors, isValid } } = useForm<FormData>({
-    resolver: yupResolver(schema),
-    mode: "onBlur",
+  const { control, handleSubmit, setFocus, formState: { errors, isValid } } = useForm<FormData>({
     defaultValues,
-    reValidateMode: "onChange",
+    resolver: yupResolver(schema),
+    mode: 'all'
   });
   const navigation = useNavigation();
   const dispatch = useDispatch();
@@ -117,29 +114,71 @@ export function SignUp() {
     }
   }, [isLogged])
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container}>
       <View style={styles.inputArea}>
-        <Input placeholder="Insira seu nome" title="Nome" name="name" control={control} />
+        <Input
+          autoFocus
+          name="name"
+          title="Nome"
+          placeholder="Insira seu nome"
+          control={control}
+          returnKeyType='next'
+          onSubmitEditing={() => console.log('email')}
+        />
 
-        <Input placeholder="Insira seu email" title="Email" name="email" control={control}/>
-        <Input placeholder="Insira sua senha" title="Senha" name="password" secureTextEntry control={control}/>
-        <Input placeholder="Confirme a senha" title="Confirme a Senha" name="confirmPassword" secureTextEntry control={control}/>
+        <Input
+          name="email"
+          title="Email"
+          placeholder="Insira seu email"
+          control={control}
+          keyboardType='email-address'
+          returnKeyType='next'
+        />
+
+        <Input
+          name="password"
+          title="Senha"
+          placeholder="Insira sua senha"
+          control={control}
+          secureTextEntry
+          returnKeyType='next'
+        />
+        <Input
+          name="confirmPassword"
+          title="Confirme a senha"
+          placeholder="Confirme a senha"
+          control={control}
+          secureTextEntry
+          returnKeyType='send'
+        />
       </View>
-      <Button title="Enviar" onPress={handleSubmit(handleSignUp)} isDisabled={!isValid} isLoading={isLogging}/>
-    </View>
+      <View style={styles.buttonArea}>
+        <Button
+          title="Enviar"
+          onPress={handleSubmit(handleSignUp)}
+          isDisabled={!isValid}
+          isLoading={isLogging}
+          style={{ alignSelf: 'flex-end' }}
+        />
+      </View>
+    </ScrollView>
   )
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingHorizontal: 24,
-    paddingVertical: 24,
     backgroundColor: '#fff',
-    justifyContent: 'space-between',
-    alignItems: 'center',
   },
   inputArea: {
     width: '100%',
+    flex: 1,
+    paddingHorizontal: 24,
+    paddingVertical: 24,
   },
+  buttonArea: {
+    paddingHorizontal: 24,
+    marginBottom: 24,
+    width: '100%',
+  }
 })

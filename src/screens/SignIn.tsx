@@ -29,22 +29,21 @@ const schema = yup.object({
   email: yup
     .string()
     .trim()
-    .email("E-mail inválido")
-    .required("Campo obrigatório"),
+    .email("O email deve ser válido")
+    .required("Este campo é obrigatório"),
   password: yup
     .string()
-    .min(6, "No mínimo 6 caracteres")
-    .required("Campo obrigatório"),
+    .min(6, "A senha deve ter no mínimo 6 caracteres")
+    .required("Este campo é obrigatório"),
 }).required();
 
 export function SignIn() {
   const { isLogged } = useAppSelector((state) => state.auth)
   const [isLogging, setIsLogging] = useState(false)
-  const { control, handleSubmit, formState: { isValid } } = useForm<FormData>({
-    resolver: yupResolver(schema),
-    mode: "onBlur",
+  const { control, register, handleSubmit, setFocus, formState: { isValid } } = useForm<FormData>({
     defaultValues,
-    reValidateMode: "onChange",
+    resolver: yupResolver(schema),
+    mode: 'all'
   });
   const navigation = useNavigation();
   const database = getDatabase(firebase);
@@ -106,10 +105,32 @@ export function SignIn() {
   return (
     <View style={styles.container}>
       <View style={styles.inputArea}>
-        <Input placeholder="Insira seu email" title="Email" name="email" control={control} />
-        <Input placeholder="Insira sua senha" title="Senha" name="password" secureTextEntry control={control} />
+        <Input
+          autoFocus
+          name="email"
+          title="Email"
+          placeholder="Insira seu email"
+          control={control}
+          returnKeyType='next'
+        />
+        <Input
+          name="password"
+          title="Senha"
+          placeholder="Insira sua senha"
+          control={control}
+          secureTextEntry
+          returnKeyType='send'
+        />
       </View>
-      <Button title="Enviar" onPress={handleSubmit(handleSignIn)} isDisabled={!isValid} isLoading={isLogging} />
+      <Button
+        title="Enviar"
+        onPress={handleSubmit(handleSignIn)}
+        isDisabled={!isValid}
+        isLoading={isLogging}
+        style={{
+          marginVertical: 24,
+        }}
+      />
     </View>
   )
 }
@@ -120,10 +141,14 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
     paddingVertical: 24,
     backgroundColor: '#fff',
-    justifyContent: 'space-between',
     alignItems: 'center',
   },
   inputArea: {
     width: '100%',
   },
+  buttonArea: {
+    paddingHorizontal: 24,
+    marginBottom: 24,
+    width: '100%',
+  }
 })

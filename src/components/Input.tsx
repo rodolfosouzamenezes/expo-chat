@@ -75,14 +75,16 @@ const styles = StyleSheet.create({
   },
   errorMessage: {
     fontSize: 12,
-    color: '#d32f2f',
+    color: '#585555',
   },
   passwordButton: {
     width: 'auto',
     height: 'auto',
     position: 'absolute',
+    paddingHorizontal: 16,
+    paddingVertical: 42,
     zIndex: 30,
-    right: 16,
-    top: 42,
+    right: 0,
+    top: 0,
   },
 })
