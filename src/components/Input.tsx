@@ -74,6 +74,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   errorMessage: {
+    marginTop: 4,
     fontSize: 12,
     color: '#585555',
   },
