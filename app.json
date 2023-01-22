@@ -19,6 +19,11 @@
     "userInterfaceStyle": "automatic",
     "assetBundlePatterns": [
       "**/*"
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "f3097a56-0c0d-4c9d-ad84-c22896945f97"
+      }
+    }
   }
 }
