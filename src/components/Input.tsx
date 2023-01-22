@@ -33,6 +33,7 @@ export function Input({ placeholder, title, name, control, rules, secureTextEntr
               onChangeText={onChange}
               onBlur={onBlur}
               underlineColorAndroid='transparent'
+              placeholderTextColor='#868585'
               cursorColor='#0fa958'
               selectionColor='#0b7e408d'
 

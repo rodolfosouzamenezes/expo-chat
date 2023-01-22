@@ -23,7 +23,7 @@ const ChatStackRoutes = () => {
         animation: 'fade_from_bottom',
       }}>
       <Screen name="ChatList" component={ChatList} options={{ headerShown: true, title: 'Conversas',  }} />
-      <Screen name="Chat" component={Chat} options={{ headerShown: true, title: 'Entrar' }} />
+      <Screen name="Chat" component={Chat} options={{ headerShown: true, title: 'Privado' }} />
     </Navigator>
   )
 }

@@ -11,11 +11,11 @@ import { showToast } from "../features/toast.slice";
 export function Config() {
   const { isLogged, user } = useAppSelector((state) => state.auth)
   const navigation = useNavigation();
-  const dispatch = useDispatch();  
+  const dispatch = useDispatch();
 
   const handleLogOut = () => {
     dispatch(logout())
-    
+
     navigation.reset({
       index: 0,
       routes: [
@@ -26,7 +26,11 @@ export function Config() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>UID: {user.uid}</Text>
+      <View style={{width: '100%'}}>
+        <Text style={styles.title}>Nome: {user.name}</Text>
+        <Text style={styles.title}>Email: {user.email}</Text>
+        <Text style={styles.title} numberOfLines={1} ellipsizeMode='tail'>UID: {user.uid}</Text>
+      </View>
       <Button title="Sair" onPress={handleLogOut} />
     </View>
   )
@@ -40,8 +44,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     justifyContent: 'space-between',
     alignItems: 'center'
-  }, 
+  },
   title: {
-    fontSize: 22
+    fontSize: 22,
+    
   }
 })
