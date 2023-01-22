@@ -31,6 +31,7 @@ const TabRoutes = () => {
       }}>
       <Screen name='ChatStack' component={ChatStackRoutes} options={{
         title: 'Conversas',
+        headerShown: false,
         tabBarBadge: 2,
         tabBarIcon: ({ focused, color }) => {
           return (

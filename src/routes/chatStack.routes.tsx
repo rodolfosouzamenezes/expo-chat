@@ -12,9 +12,17 @@ const ChatStackRoutes = () => {
       initialRouteName='ChatList'
       screenOptions={{
         headerShown: false,
+        headerTintColor: '#fff',
+        headerTitleAlign: 'center',
+        headerTitleStyle: {
+          fontSize: 22,
+        },
+        headerStyle: {
+          backgroundColor: '#0fa958',
+        },
         animation: 'fade_from_bottom',
       }}>
-      <Screen name="ChatList" component={ChatList} />
+      <Screen name="ChatList" component={ChatList} options={{ headerShown: true, title: 'Conversas',  }} />
       <Screen name="Chat" component={Chat} options={{ headerShown: true, title: 'Entrar' }} />
     </Navigator>
   )
