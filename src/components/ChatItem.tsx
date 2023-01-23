@@ -1,14 +1,15 @@
 import { StyleSheet, Text, TouchableHighlight } from "react-native";
+import { IChat } from "../features/chat.slice";
 
 interface IChatItemProps {
-  data: string;
+  data: IChat;
   onPress: (id: string) => void;
 }
 
 export function ChatItem({data, onPress}: IChatItemProps) {
   return (
-    <TouchableHighlight underlayColor='#DDDDDD' onPress={() => onPress(data)} style={styles.container}>
-      <Text style={styles.userName}>{data}</Text>
+    <TouchableHighlight underlayColor='#DDDDDD' onPress={() => onPress(data.id)} style={styles.container}>
+      <Text style={styles.userName}>{data.title}</Text>
     </TouchableHighlight>
   )
 }

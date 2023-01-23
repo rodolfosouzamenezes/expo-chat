@@ -1,16 +1,15 @@
-import React, { useCallback, useEffect } from "react";
-import { Text, SafeAreaView, StyleSheet, View, FlatList, Alert } from "react-native";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
+import { get, getDatabase, ref } from "firebase/database";
+import { StyleSheet, View, FlatList } from "react-native";
+import React, { useCallback, useEffect } from "react";
 import { useDispatch } from "react-redux";
 
-import { useAppSelector } from "../store";
-import { Button } from "../components/Button";
-import { logout } from "../features/auth.slice";
-import { get, getDatabase, ref } from "firebase/database";
-import { firebase } from "../config/firebase";
 import { setActiveChat, setChats } from "../features/chat.slice";
-import { ChatItem } from "../components/ChatItem";
 import { showToast } from "../features/toast.slice";
+import { firebase } from "../config/firebase";
+import { useAppSelector } from "../store";
+
+import { ChatItem } from "../components/ChatItem";
 
 export function ChatList() {
   const { user } = useAppSelector((state) => state.auth)
@@ -21,9 +20,9 @@ export function ChatList() {
 
   const fetchChatList = async () => {
     try {
-      const response = await get(ref(database, 'users/' + user.uid + '/chats'))
-      const chats = response.val() as { [id: string]: { id: string } }
-      const chatKeysArray = Object.keys(chats)
+      const response = await get(ref(database, 'users/' + user.uid + '/chats'))      
+      const chats = response.val() as { [id: string]: { id: string, title: string } }
+      const chatKeysArray = Object.values(chats)      
 
       dispatch(setChats(chatKeysArray))
     } catch (error) {
@@ -33,7 +32,7 @@ export function ChatList() {
   }
 
   const handleChatSelect = (chatId: string) => {
-    dispatch(setActiveChat({ chatId }));
+    dispatch(setActiveChat(chatId));
 
   }
 
@@ -55,7 +54,7 @@ export function ChatList() {
             <ChatItem
               key={`${index}-${item}`}
               data={item}
-              onPress={() => handleChatSelect(item)}
+              onPress={handleChatSelect}
             />
           )
         }}
@@ -66,7 +65,6 @@ export function ChatList() {
 
 const styles = StyleSheet.create({
   container: {
-    paddingVertical: 25,
     flex: 1,
     justifyContent: 'space-between',
     alignItems: 'center',

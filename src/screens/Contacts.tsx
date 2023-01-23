@@ -1,17 +1,19 @@
-import React, { useCallback, useEffect } from "react";
-import { Text, SafeAreaView, StyleSheet, View, FlatList } from "react-native";
+import React, { useCallback } from "react";
+import { StyleSheet, View, FlatList } from "react-native";
+
+import { get, getDatabase, push, ref, orderByChild, query, child, set, update } from "firebase/database";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { useDispatch } from "react-redux";
 
-import { useAppSelector } from "../store";
-import { get, getDatabase, push, ref, orderByChild, query, child, set, update } from "firebase/database";
-import { firebase } from "../config/firebase";
 import { IContact, setActiveChat, setContacts } from "../features/chat.slice";
+import { firebase } from "../config/firebase";
+import { useAppSelector } from "../store";
+
 import { ContactItem } from "../components/ContactItem";
 
 export function Contacts() {
   const { contacts } = useAppSelector((state) => state.chat)
-  const { uid } = useAppSelector((state) => state.auth.user)
+  const { user } = useAppSelector((state) => state.auth)
   const navigation = useNavigation();
   const database = getDatabase(firebase);
   const dispatch = useDispatch();
@@ -19,22 +21,22 @@ export function Contacts() {
   const getContacts = async () => {
     let contacts: IContact[] = [];
 
-    const que = query(ref(database, 'users'), orderByChild('name'))
+    const usersQuery = query(ref(database, 'users'), orderByChild('name'))
 
-    await get(que)
+    await get(usersQuery)
       .then((usersResponse) => {
-        usersResponse.forEach((user) => {
-          const name = user.val().name as string;
-          const id = user.key;
+        usersResponse.forEach((contact) => {
+          const name = contact.val().name as string;
+          const id = contact.key;
 
-          id !== uid &&
+          id !== user.uid &&
             contacts.push({ name, id })
         })
       });
 
-    contacts.sort((a, b) => {
-      var nameA = a.name.toUpperCase(); 
-      var nameB = b.name.toUpperCase(); 
+    contacts.sort((contactA, contactB) => {
+      var nameA = contactA.name.toUpperCase(); 
+      var nameB = contactB.name.toUpperCase(); 
       if (nameA < nameB) {
         return -1;
       }
@@ -48,25 +50,27 @@ export function Contacts() {
     dispatch(setContacts(contacts))
   }
 
-  const handleContactPress = async (id: string) => {
+  const handleContactPress = async (contact: IContact) => {
     const newChat = await push(ref(database, 'chats/'));
     const newChatId = newChat.key;
-    set(newChat, {  
+
+    // Create a new chat
+    await set(newChat, {  
       members: {
-        [uid]: { id: uid,},
-        [id]: { id }
+        [user.uid]: { id: user.uid,},
+        [contact.id]: { id: contact.id }
       }
     })
 
-    update(child(ref(database), `users/${uid}/chats/`), {
-      [newChatId]: { id: newChatId }
+    // Linking users with chat
+    await update(child(ref(database), `users/${user.uid}/chats/`), {
+      [newChatId]: { id: newChatId, title: contact.name }
     })
-    update(child(ref(database), `users/${id}/chats/`), {
-      [newChatId]: { id: newChatId }
+    await update(child(ref(database), `users/${contact.id}/chats/`), {
+      [newChatId]: { id: newChatId, title: contact.name }
     })
 
-    dispatch(setActiveChat({ chatId: newChatId }))
-
+    dispatch(setActiveChat(newChatId))
     navigation.navigate('ChatStack')
   }
 

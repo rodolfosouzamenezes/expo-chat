@@ -5,8 +5,13 @@ export interface IContact {
   name: string;
 }
 
+export interface IChat {
+  id: string;
+  title: string;
+}
+
 interface IChatState {
-  chats: string[];
+  chats: IChat[];
   contacts: IContact[];
   activeChat: string;
 }
@@ -24,11 +29,11 @@ const chatSlice = createSlice({
     setContacts: (state = initialState, action: PayloadAction<IContact[]>) => {
       state.contacts = [...action.payload]
     },
-    setChats: (state = initialState, action: PayloadAction<string[]>) => {
+    setChats: (state = initialState, action: PayloadAction<IChat[]>) => {
       state.chats = [...action.payload]
     },
-    setActiveChat: (state = initialState, action: PayloadAction<{ chatId: string | null }>) => {
-      state.activeChat = action.payload.chatId
+    setActiveChat: (state = initialState, action: PayloadAction<string>) => {
+      state.activeChat = action.payload
     },
   }
 })

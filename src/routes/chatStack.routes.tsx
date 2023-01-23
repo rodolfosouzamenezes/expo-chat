@@ -17,7 +17,7 @@ const ChatStackRoutes = () => {
   const navigation = useNavigation();
 
   const handleGoBack = () => {
-    dispatch(setActiveChat({ chatId: null }));
+    dispatch(setActiveChat(null));
     navigation.navigate('ChatList')
   }
 

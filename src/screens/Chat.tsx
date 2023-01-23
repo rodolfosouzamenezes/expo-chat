@@ -13,18 +13,15 @@ export function Chat() {
 
   useEffect(() => {
     const handleBackButton = () => {
-      dispatch(setActiveChat({ chatId: null }));
+      dispatch(setActiveChat(null));
       navigation.navigate('ChatList')
 
       return true;
     }
-
-    console.log('foi');
     
     const backHandler = BackHandler.addEventListener('hardwareBackPress', handleBackButton);
 
     return () => {
-      console.log('backaa');
       backHandler.remove()
     };
   }, [navigation]);

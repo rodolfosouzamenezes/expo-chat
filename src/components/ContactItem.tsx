@@ -3,12 +3,12 @@ import { IContact } from "../features/chat.slice";
 
 interface IContactItemProps {
   data: IContact;
-  onPress: (id: string) => void;
+  onPress: (user: IContact) => void;
 }
 
 export function ContactItem({data, onPress}: IContactItemProps) {
   return (
-    <TouchableHighlight underlayColor='#DDDDDD' onPress={() => onPress(data.id)} style={styles.container}>
+    <TouchableHighlight underlayColor='#DDDDDD' onPress={() => onPress(data)} style={styles.container}>
       <Text style={styles.userName}>{data.name}</Text>
     </TouchableHighlight>
   )
