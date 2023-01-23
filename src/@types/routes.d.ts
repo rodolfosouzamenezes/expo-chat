@@ -7,6 +7,7 @@ export declare global {
       SignIn: undefined;
       ChatStack: undefined;
       Chat: undefined;
+      ChatList: undefined;
       Tabs: undefined;
     }
   }

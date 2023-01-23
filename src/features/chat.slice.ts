@@ -27,7 +27,7 @@ const chatSlice = createSlice({
     setChats: (state = initialState, action: PayloadAction<string[]>) => {
       state.chats = [...action.payload]
     },
-    setActiveChat: (state = initialState, action: PayloadAction<{ chatId: string }>) => {
+    setActiveChat: (state = initialState, action: PayloadAction<{ chatId: string | null }>) => {
       state.activeChat = action.payload.chatId
     },
   }

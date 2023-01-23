@@ -1,14 +1,33 @@
-import React from "react";
-import { Text, SafeAreaView, StyleSheet, View } from "react-native";
+import React, { useEffect } from "react";
+import { Text, SafeAreaView, StyleSheet, View, BackHandler } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { useDispatch } from "react-redux";
 
 import { useAppSelector } from "../store";
+import { setActiveChat } from "../features/chat.slice";
 
 export function Chat() {
   const { activeChat } = useAppSelector((state) => state.chat)
   const navigation = useNavigation();
   const dispatch = useDispatch();  
+
+  useEffect(() => {
+    const handleBackButton = () => {
+      dispatch(setActiveChat({ chatId: null }));
+      navigation.navigate('ChatList')
+
+      return true;
+    }
+
+    console.log('foi');
+    
+    const backHandler = BackHandler.addEventListener('hardwareBackPress', handleBackButton);
+
+    return () => {
+      console.log('backaa');
+      backHandler.remove()
+    };
+  }, [navigation]);
 
   return (
     <View style={{flex: 1,}}>
