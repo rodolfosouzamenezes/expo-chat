@@ -21,7 +21,7 @@ export function ChatList() {
   const fetchChatList = async () => {
     try {
       const response = await get(ref(database, 'users/' + user.uid + '/chats'))      
-      const chats = response.val() as { [id: string]: { id: string, title: string } }
+      const chats = response.val() as { [id: string]: { id: string, title: string, recipientId: string } }
       const chatKeysArray = Object.values(chats)      
 
       dispatch(setChats(chatKeysArray))

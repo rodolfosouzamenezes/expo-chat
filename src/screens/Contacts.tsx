@@ -12,7 +12,7 @@ import { useAppSelector } from "../store";
 import { ContactItem } from "../components/ContactItem";
 
 export function Contacts() {
-  const { contacts } = useAppSelector((state) => state.chat)
+  const { contacts, chats } = useAppSelector((state) => state.chat)
   const { user } = useAppSelector((state) => state.auth)
   const navigation = useNavigation();
   const database = getDatabase(firebase);
@@ -35,8 +35,8 @@ export function Contacts() {
       });
 
     contacts.sort((contactA, contactB) => {
-      var nameA = contactA.name.toUpperCase(); 
-      var nameB = contactB.name.toUpperCase(); 
+      var nameA = contactA.name.toUpperCase();
+      var nameB = contactB.name.toUpperCase();
       if (nameA < nameB) {
         return -1;
       }
@@ -51,26 +51,45 @@ export function Contacts() {
   }
 
   const handleContactPress = async (contact: IContact) => {
-    const newChat = await push(ref(database, 'chats/'));
-    const newChatId = newChat.key;
+    let chatWithThisUser = chats.find(chat => chat.recipientId === contact.id)
 
-    // Create a new chat
-    await set(newChat, {  
-      members: {
-        [user.uid]: { id: user.uid,},
-        [contact.id]: { id: contact.id }
+    if (!chatWithThisUser) {
+      // Generates a new child unique key
+      const newChat = await push(ref(database, 'chats/'));
+      const newChatId = newChat.key;
+
+      // Create a new chat
+      await set(newChat, {
+        members: {
+          [user.uid]: { id: user.uid, },
+          [contact.id]: { id: contact.id },
+        }
+      })
+
+      // Linking users with chat
+      await update(child(ref(database), `users/${user.uid}/chats/`), {
+        [newChatId]: {
+          id: newChatId,
+          title: contact.name,
+          recipientId: contact.id
+        }
+      })
+      await update(child(ref(database), `users/${contact.id}/chats/`), {
+        [newChatId]: {
+          id: newChatId,
+          title: contact.name,
+          recipientId: user.uid
+        }
+      })
+
+      chatWithThisUser = {
+        id: newChatId,
+        title: contact.name,
+        recipientId: contact.id
       }
-    })
+    }
 
-    // Linking users with chat
-    await update(child(ref(database), `users/${user.uid}/chats/`), {
-      [newChatId]: { id: newChatId, title: contact.name }
-    })
-    await update(child(ref(database), `users/${contact.id}/chats/`), {
-      [newChatId]: { id: newChatId, title: contact.name }
-    })
-
-    dispatch(setActiveChat(newChatId))
+    dispatch(setActiveChat(chatWithThisUser.id))
     navigation.navigate('ChatStack')
   }
 

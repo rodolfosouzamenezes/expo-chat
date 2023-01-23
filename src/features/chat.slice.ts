@@ -8,6 +8,7 @@ export interface IContact {
 export interface IChat {
   id: string;
   title: string;
+  recipientId: string;
 }
 
 interface IChatState {
