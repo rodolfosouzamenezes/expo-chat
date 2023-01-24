@@ -33,7 +33,6 @@ export function ChatList() {
 
   const handleChatSelect = (chatId: string) => {
     dispatch(setActiveChat(chatId));
-
   }
 
   useFocusEffect(useCallback(() => {
@@ -41,7 +40,7 @@ export function ChatList() {
   }, []));
 
   useEffect(() => {
-    activeChat !== null && navigation.navigate('Chat')
+    activeChat.id !== null && navigation.navigate('Chat')
   }, [activeChat])
 
   return (

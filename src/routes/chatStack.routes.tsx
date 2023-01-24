@@ -9,10 +9,12 @@ import { headerStyle } from '../styles/navigation';
 import { useDispatch } from 'react-redux';
 import { setActiveChat } from '../features/chat.slice';
 import { useNavigation } from '@react-navigation/native';
+import { useAppSelector } from '../store';
 
 const { Screen, Navigator } = createNativeStackNavigator();
 
 const ChatStackRoutes = () => {
+  const { activeChat } = useAppSelector((state) => state.chat)
   const dispatch = useDispatch();
   const navigation = useNavigation();
 
@@ -40,7 +42,7 @@ const ChatStackRoutes = () => {
         name="Chat"
         component={Chat}
         options={{
-          title: 'Privado',
+          title: activeChat?.title || '',
           headerLeft({ tintColor, canGoBack }) {
             return (
               <TouchableOpacity

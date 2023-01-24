@@ -41,12 +41,10 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: 24,
     paddingVertical: 24,
-    backgroundColor: '#fff',
     justifyContent: 'space-between',
     alignItems: 'center'
   },
   title: {
     fontSize: 22,
-    
   }
 })

@@ -14,13 +14,17 @@ export interface IChat {
 interface IChatState {
   chats: IChat[];
   contacts: IContact[];
-  activeChat: string;
+  activeChat: IChat;
 }
 
 const initialState: IChatState = {
   chats: [],
   contacts: [],
-  activeChat: null,
+  activeChat: {
+    id: null,
+    title: null,
+    recipientId: null,
+  },
 }
 
 const chatSlice = createSlice({
@@ -34,7 +38,9 @@ const chatSlice = createSlice({
       state.chats = [...action.payload]
     },
     setActiveChat: (state = initialState, action: PayloadAction<string>) => {
-      state.activeChat = action.payload
+      const activeChat = state.chats.find(chat => chat.id === action.payload)
+        
+      state.activeChat= activeChat || initialState.activeChat
     },
   }
 })

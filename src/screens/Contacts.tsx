@@ -5,7 +5,7 @@ import { get, getDatabase, push, ref, orderByChild, query, child, set, update } 
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { useDispatch } from "react-redux";
 
-import { IContact, setActiveChat, setContacts } from "../features/chat.slice";
+import { IContact, setActiveChat, setChats, setContacts } from "../features/chat.slice";
 import { firebase } from "../config/firebase";
 import { useAppSelector } from "../store";
 
@@ -89,6 +89,9 @@ export function Contacts() {
       }
     }
 
+    console.log(chatWithThisUser);
+    
+    dispatch(setChats([...chats, chatWithThisUser]))
     dispatch(setActiveChat(chatWithThisUser.id))
     navigation.navigate('ChatStack')
   }

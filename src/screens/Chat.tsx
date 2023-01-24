@@ -28,7 +28,7 @@ export function Chat() {
 
   return (
     <View style={{flex: 1,}}>
-      <Text style={styles.title}>Chat ativo: {activeChat}</Text>
+      <Text style={styles.title}>Chat ativo: {activeChat.id}</Text>
     </View>
   )
 }
