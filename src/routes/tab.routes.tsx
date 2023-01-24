@@ -4,7 +4,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Config } from '../screens/Config';
 import { Contacts } from '../screens/Contacts';
 import ChatStackRoutes from './chatStack.routes';
-import { Text } from 'react-native';
+import { getFocusedRouteNameFromRoute, useRoute } from '@react-navigation/native';
 import { headerStyleTab } from '../styles/navigation';
 
 const { Screen, Navigator } = createBottomTabNavigator();
@@ -26,14 +26,21 @@ const TabRoutes = () => {
       <Screen
         name='ChatStack'
         component={ChatStackRoutes}
-        options={{
-          headerShown: false,
-          tabBarBadge: 2,
-          tabBarIcon: ({ focused, color }) => {
-            return (
-              <Ionicons name='chatbox' size={focused ? 32 : 28} color={color} />
-            )
-          },
+        options={({ route }) => {
+          const focusedRouteName = getFocusedRouteNameFromRoute(route)
+
+          return {
+            headerShown: false,
+            tabBarStyle: {
+              display: focusedRouteName === 'Chat' ? 'none' : 'flex'
+            },
+            tabBarBadge: 2,
+            tabBarIcon: ({ focused, color }) => {
+              return (
+                <Ionicons name='chatbox' size={focused ? 32 : 28} color={color} />
+              )
+            },
+          }
         }}
       />
 
