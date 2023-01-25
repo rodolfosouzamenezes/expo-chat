@@ -1,15 +1,14 @@
-import { Dimensions, KeyboardAvoidingView, Platform, ScrollView, ScrollViewComponent, StyleSheet, View } from "react-native";
-import { useNavigation } from "@react-navigation/native";
-import { useDispatch } from "react-redux";
-import { useEffect, useState } from "react";
-import { useController, useForm } from "react-hook-form";
-import { getDatabase, ref, set } from "firebase/database";
+import { createUserWithEmailAndPassword, User } from "firebase/auth/react-native";
+import { ScrollView, StyleSheet, View } from "react-native";
 import { yupResolver } from "@hookform/resolvers/yup";
+import { doc, setDoc } from "firebase/firestore";
+import { useForm } from "react-hook-form";
+import { useDispatch } from "react-redux";
+import { useState } from "react";
 import * as yup from "yup";
 
-import { auth, createUserWithEmailAndPassword, firebase } from "../config/firebase";
+import { auth, db } from "../config/firebase";
 import { showToast } from "../features/toast.slice";
-import { useAppSelector } from "../store";
 import { login } from "../features/auth.slice";
 
 import { Button } from "../components/Button";
@@ -29,6 +28,7 @@ const defaultValues: FormData = {
   confirmPassword: '',
 }
 
+// Schema Validation 
 const schema = yup.object({
   name: yup
     .string()
@@ -49,70 +49,51 @@ const schema = yup.object({
 }).required();
 
 export function SignUp() {
-  const database = getDatabase(firebase);
-  const [isLogging, setIsLogging] = useState(false)
-  const { isLogged } = useAppSelector((state) => state.auth)
-  const { control, handleSubmit, setFocus, formState: { errors, isValid } } = useForm<FormData>({
+  const { control, handleSubmit, formState: { isValid } } = useForm<FormData>({
     defaultValues,
     resolver: yupResolver(schema),
     mode: 'all'
   });
-  const navigation = useNavigation();
+  const [isLogging, setIsLogging] = useState(false)
   const dispatch = useDispatch();
+
+  const setUser = async (user: User, name: string) => {
+    const userRef = doc(db, 'users', user.uid);
+    await setDoc(userRef, { name })
+
+    dispatch(login({
+      uid: user.uid,
+      email: user.email,
+      name,
+    }));
+  }
 
   const handleSignUp = async ({ email, password, name }: FormData) => {
     setIsLogging(true)
-    createUserWithEmailAndPassword(auth, email, password)
-      .then(async (userCredential) => {
+    await createUserWithEmailAndPassword(auth, email, password)
+      .then((userCredential) => {
         const user = userCredential.user;
 
-        dispatch(login({
-          name: name,
-          email: user.email,
-          uid: user.uid
-        }))
-
-        set(ref(database, 'users/' + user.uid), {
-          name: name,
-        })
+        // Set user in Firestore and Redux
+        setUser(user, name)
       })
       .catch((error) => {
-        setIsLogging(false)
-        switch (error.code) {
-          case 'auth/email-already-in-use':
-            dispatch(showToast({ message: 'Já existe uma conta com este email!', type: 'error' }))
-            break
-          case 'auth/invalid-email':
-            dispatch(showToast({ message: 'Email inválido!', type: 'error' }))
-            break
-          case 'auth/operation-not-allowed':
-            dispatch(showToast({ message: 'Tente novamente mais tarde!', type: 'error' }))
-            break
-          case 'auth/weak-password':
-            dispatch(showToast({ message: 'Senha muito fraca!\nA senha deve ter no mínimo 6 caracteres', type: 'error' }))
-            break
-          case 'auth/missing-email':
-            dispatch(showToast({ message: 'Insira um email!', type: 'error' }))
-            break
-          default:
-            dispatch(showToast({ message: 'Ops! Ocorreu algum erro!', type: 'error' }))
-            console.log('error code:', error.code, '| message:', error.message);
-            break
+        const errorMessages = {
+          "auth/email-already-in-use": 'Já existe uma conta com este email!',
+          "auth/invalid-email": 'Email inválido!',
+          "auth/operation-not-allowed": 'Tente novamente mais tarde!',
+          "auth/weak-password": 'Senha muito fraca!\nA senha deve ter no mínimo 6 caracteres',
+          "auth/missing-email": 'Insira um email!',
         }
+
+        const errorMessage = errorMessages[error.code] || 'Ops! Ocorreu algum erro!';
+
+        dispatch(showToast({ message: errorMessage, type: 'error' }));
+        console.log('error code:', error.code, '| message:', error.message);
       })
+      .finally(() => setIsLogging(false))
   }
 
-  useEffect(() => {
-    if (isLogged) {
-      navigation.reset({
-        index: 0,
-        routes: [
-          { name: 'Tabs' },
-        ],
-      })
-      setTimeout(() => setIsLogging(false), 2000)
-    }
-  }, [isLogged])
   return (
     <ScrollView style={styles.container}>
       <View style={styles.inputArea}>

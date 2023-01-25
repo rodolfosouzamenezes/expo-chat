@@ -1,17 +1,16 @@
-import { get, getDatabase, ref } from "firebase/database";
-import { StyleSheet, View, Keyboard } from "react-native";
-import { useNavigation } from "@react-navigation/native";
+import { signInWithEmailAndPassword, User } from "firebase/auth/react-native";
+import { collection, doc, getDoc } from "firebase/firestore";
 import { yupResolver } from "@hookform/resolvers/yup";
+import { StyleSheet, View } from "react-native";
 import { useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import * as yup from "yup";
 
-import { auth, firebase, signInWithEmailAndPassword } from "../config/firebase";
-import { useAppSelector } from "../store";
 import { showToast } from "../features/toast.slice";
-
 import { login } from "../features/auth.slice";
+import { auth, db } from "../config/firebase";
+
 import { Button } from "../components/Button";
 import { Input } from "../components/Input";
 
@@ -38,69 +37,48 @@ const schema = yup.object({
 }).required();
 
 export function SignIn() {
-  const { isLogged } = useAppSelector((state) => state.auth)
-  const [isLogging, setIsLogging] = useState(false)
-  const { control, register, handleSubmit, setFocus, formState: { isValid } } = useForm<FormData>({
+  const { control, handleSubmit, formState: { isValid } } = useForm<FormData>({
     defaultValues,
     resolver: yupResolver(schema),
     mode: 'all'
   });
-  const navigation = useNavigation();
-  const database = getDatabase(firebase);
+  const [isLogging, setIsLogging] = useState(false)
   const dispatch = useDispatch();
 
-  const handleSignIn = ({ email, password }: FormData) => {
-    setIsLogging(true)
-    signInWithEmailAndPassword(auth, email, password)
-      .then(async (userCredential) => {
-        const user = userCredential.user;
+  const setUser = async (user: User) => {
+    const userCollectionRef = collection(db, "users")
+    const data = await getDoc(doc(userCollectionRef, user.uid))
 
-        get(ref(database, 'users/' + user.uid + '/name'))
-          .then(name => {
-            const userName = name.val() as string;
-            dispatch(login({
-              email,
-              name: userName,
-              uid: user.uid,
-            }))
-          })
-          .catch(console.log)
-      })
-      .catch((error) => {
-        setIsLogging(false)
-        switch (error.code) {
-          case 'auth/user-disabled':
-            dispatch(showToast({ message: 'Usuário desabilitado!', type: 'error' }))
-            break
-          case 'auth/invalid-email':
-            dispatch(showToast({ message: 'Email e/ou senha inválidos!', type: 'error' }))
-            break
-          case 'auth/wrong-password':
-            dispatch(showToast({ message: 'Email e/ou senha inválidos!', type: 'error' }))
-            break
-          case 'auth/user-not-found':
-            dispatch(showToast({ message: 'Email e/ou senha inválidos!', type: 'error' }))
-            break
-          default:
-            dispatch(showToast({ message: 'Ops! Ocorreu algum erro!', type: 'error' }))
-            console.log('error code:', error.code, '| message:', error.message);
-            break
-        }
-      })
+    dispatch(login({
+      uid: user.uid,
+      email: user.email,
+      name: data.data().name,
+    }));
   }
 
-  useEffect(() => {
-    if (isLogged) {
-      Keyboard.dismiss()
-      navigation.reset({
-        index: 0,
-        routes: [
-          { name: 'Tabs' },
-        ],
+  const handleSignIn = async ({ email, password }: FormData) => {
+    setIsLogging(true)
+
+    await signInWithEmailAndPassword(auth, email, password)
+      .then(userCredential => {
+        const user = userCredential.user;
+
+        setUser(user)
       })
-      setTimeout(() => setIsLogging(false), 2000)
-    }
-  }, [isLogged])
+      .catch(error => {
+        const errorMessages = {
+          "auth/user-disabled": 'Usuário desabilitado!',
+          "auth/invalid-email": 'Email e/ou senha inválidos!',
+          "auth/wrong-password": 'Email e/ou senha inválidos!',
+          "auth/user-not-found": 'Email e/ou senha inválidos!',
+        }
+
+        const errorMessage = errorMessages[error.code] || 'Ops! Ocorreu algum erro!';
+        dispatch(showToast({ message: errorMessage, type: 'error' }))
+        console.log('error code:', error.code, '| message:', error.message);
+      })
+      .finally(() => setIsLogging(false))
+  }
 
   return (
     <View style={styles.container}>

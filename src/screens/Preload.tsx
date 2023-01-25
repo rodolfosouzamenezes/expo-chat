@@ -1,13 +1,13 @@
 import { StackActions, useNavigation } from "@react-navigation/native";
+import { onAuthStateChanged } from "firebase/auth/react-native";
 import { ActivityIndicator, SafeAreaView } from "react-native";
 import { collection, doc, getDoc } from "firebase/firestore";
 import { useDispatch } from "react-redux";
 import { User } from "firebase/auth";
 import { useEffect } from "react";
 
-import { auth, db } from "../config/firebase";
 import { login } from "../features/auth.slice";
-import { onAuthStateChanged } from "firebase/auth/react-native";
+import { auth, db } from "../config/firebase";
 
 export function Preload() {
   const navigation = useNavigation();
@@ -24,7 +24,6 @@ export function Preload() {
     }));
   }
 
-
   useEffect(() => {
     onAuthStateChanged(auth, user => {
       if (user === null) {
@@ -34,11 +33,16 @@ export function Preload() {
         return
       }
 
+      // Set user in Redux
       setUser(user);
 
-      navigation.dispatch(
-        StackActions.replace('Tabs')
-      )
+      // Navigate to Tabs and clear history route
+      navigation.reset({
+        index: 0,
+        routes: [
+          { name: 'Tabs' },
+        ],
+      })
     })
   })
 
