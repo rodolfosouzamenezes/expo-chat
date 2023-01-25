@@ -29,11 +29,17 @@ const TabRoutes = () => {
         options={({ route }) => {
           const focusedRouteName = getFocusedRouteNameFromRoute(route)
 
+          if (focusedRouteName === 'Chat') {
+            return {
+              headerShown: false,
+              tabBarStyle: {
+                display: 'none'
+              },
+            }
+          }
+          
           return {
             headerShown: false,
-            tabBarStyle: {
-              display: focusedRouteName === 'Chat' ? 'none' : 'flex'
-            },
             tabBarBadge: 2,
             tabBarIcon: ({ focused, color }) => {
               return (

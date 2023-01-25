@@ -17,6 +17,7 @@
     "@reduxjs/toolkit": "^1.9.1",
     "@types/react": "~18.0.24",
     "@types/react-native": "~0.70.6",
+    "dayjs": "^1.11.7",
     "expo": "~47.0.12",
     "expo-splash-screen": "~0.17.5",
     "expo-status-bar": "~1.4.2",
