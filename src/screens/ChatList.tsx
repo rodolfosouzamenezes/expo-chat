@@ -14,13 +14,11 @@ import { Loading } from "../components/Loading";
 export function ChatList() {
   const { activeChat, chats } = useAppSelector((state) => state.chat)
   const { user } = useAppSelector((state) => state.auth)
-  const [isLoading, setIsLoading] = useState(true)
   const navigation = useNavigation();
   const dispatch = useDispatch();
 
   const fetchChatList = async () => {
     try {
-      setIsLoading(true)
       // Get chats in the database
       const chatsDocRef = collection(db, "users")
       const chatsSnapshot = await getDoc(doc(chatsDocRef, user.uid.toString()))
@@ -31,11 +29,9 @@ export function ChatList() {
       dispatch(setChats(chatsData || []))
     } catch (error) {
       console.log(error);
-    } finally {
-      setIsLoading(false)
     }
   }
-
+  
   const handleChatSelect = (chatId: string) => {
     dispatch(setActiveChat(chatId));
   }
@@ -52,22 +48,19 @@ export function ChatList() {
 
   return (
     <View style={styles.container}>
-      {
-        isLoading ? <Loading /> :
-          <FlatList
-            style={styles.chatList}
-            data={chats}
-            renderItem={({ item, index }) => {
-              return (
-                <ChatItem
-                  key={`${index}-${item}`}
-                  data={item}
-                  onPress={handleChatSelect}
-                />
-              )
-            }}
-          />
-      }
+      <FlatList
+        style={styles.chatList}
+        data={chats}
+        renderItem={({ item, index }) => {
+          return (
+            <ChatItem
+              key={`${index}-${item}`}
+              data={item}
+              onPress={handleChatSelect}
+            />
+          )
+        }}
+      />
     </View>
   )
 }
