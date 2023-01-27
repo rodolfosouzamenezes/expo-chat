@@ -1,6 +1,6 @@
 import { addDoc, serverTimestamp, onSnapshot, orderBy, query, collection } from "firebase/firestore";
 import { StyleSheet, View, BackHandler, FlatList, TextInput, TouchableOpacity } from "react-native";
-import React, { useEffect, useLayoutEffect, useState } from "react";
+import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useNavigation } from "@react-navigation/native";
 import { Ionicons } from '@expo/vector-icons';
 import { useDispatch } from "react-redux";
@@ -15,6 +15,7 @@ import { showToast } from "../features/toast.slice";
 export function Chat() {
   const [messages, setMessages] = useState<IMessage[]>([])
   const [textInput, setTextInput] = useState('')
+  const flatListRef = useRef<FlatList<IMessage>>(null);
 
   const navigation = useNavigation();
   const dispatch = useDispatch();
@@ -25,7 +26,7 @@ export function Chat() {
     auth: { user },
   } = useAppSelector((state) => state);
 
-  const messageCollection = collection(db, 'chats', activeChat.id.toString(), 'messages');
+  const messageCollection = collection(db, 'chats', activeChat?.id.toString(), 'messages');
 
   const sendMessage = async () => {
     // Return if is an empty message
@@ -48,7 +49,7 @@ export function Chat() {
   // Add listener for new message
   useLayoutEffect(() => {
     if (activeChat.id) {
-      const messagesSortedByDateRef = query(messageCollection, orderBy("date", "asc"))
+      const messagesSortedByDateRef = query(messageCollection, orderBy("date", "desc"))
       const unsubscribe = onSnapshot(messagesSortedByDateRef, snapshot => {
 
         // Format messageSnapshot to IMessage
@@ -65,9 +66,12 @@ export function Chat() {
             date: timestampToDate,
           }
         })
- 
+
         if (dataMessages) {
           setMessages(dataMessages)
+
+          // Scroll the flat list to the top when you get a new message
+          flatListRef?.current.scrollToIndex({ index: 0 })
         }
       })
 
@@ -78,8 +82,8 @@ export function Chat() {
   // Clear ActiveChat on press Back Button
   useEffect(() => {
     const handleBackButton = () => {
-      dispatch(setActiveChat(null));
       navigation.navigate('ChatList')
+      dispatch(setActiveChat(null));
 
       return true;
     }
@@ -97,6 +101,8 @@ export function Chat() {
         data={messages}
         contentContainerStyle={{ paddingBottom: 80 }}
         renderItem={({ item, index }) => <Message key={index} data={item} />}
+        inverted
+        ref={flatListRef}
         style={styles.chatArea}
       />
       <View style={styles.sendArea}>

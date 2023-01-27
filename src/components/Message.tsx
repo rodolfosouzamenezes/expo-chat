@@ -42,7 +42,7 @@ const styles = StyleSheet.create({
   senderMessage: {
     alignSelf: 'flex-end',
     borderTopRightRadius: 0,
-    backgroundColor: '#c2dacc',
+    backgroundColor: '#cbcecc',
   },
   recipientMessage: {
     alignSelf: 'flex-start',
