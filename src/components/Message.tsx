@@ -10,6 +10,11 @@ interface MessageProps {
 export function Message({ data: { id, message, senderId, date } }: MessageProps) {
   const { user } = useAppSelector((state) => state.auth)
 
+  // Verify if the date doesn't match
+  if (date === null) {
+    return <View></View>
+  }
+
   return (
     <View
       style={[
@@ -17,7 +22,7 @@ export function Message({ data: { id, message, senderId, date } }: MessageProps)
         user.uid === senderId ? styles.senderMessage : styles.recipientMessage
       ]}>
       <Text style={user.uid === senderId ? styles.senderText : styles.recipientText}>{message}</Text>
-      <Text style={styles.date}>{dayjs(date).format('HH:mm')}</Text>
+       <Text style={styles.date}>{dayjs(date).format('HH:mm')}</Text>
     </View>
   )
 }

@@ -1,10 +1,9 @@
-import { addDoc, serverTimestamp, onSnapshot, orderBy, query, Timestamp, collection } from "firebase/firestore";
+import { addDoc, serverTimestamp, onSnapshot, orderBy, query, collection } from "firebase/firestore";
 import { StyleSheet, View, BackHandler, FlatList, TextInput, TouchableOpacity } from "react-native";
 import React, { useEffect, useLayoutEffect, useState } from "react";
 import { useNavigation } from "@react-navigation/native";
 import { Ionicons } from '@expo/vector-icons';
 import { useDispatch } from "react-redux";
-import dayjs from "dayjs";
 
 import { IMessage, setActiveChat } from "../features/chat.slice";
 import { useAppSelector } from "../store";
@@ -35,7 +34,7 @@ export function Chat() {
     try {
       // Add new message to collection
       await addDoc(messageCollection, {
-        date: serverTimestamp(),
+        date: serverTimestamp(), // Get timestamp in firebase server
         message: textInput,
         senderId: user.uid
       });
@@ -55,16 +54,18 @@ export function Chat() {
         // Format messageSnapshot to IMessage
         const dataMessages: IMessage[] = snapshot.docs.map(doc => {
           const { senderId, message, date } = doc.data();
-          const timestampDate = date instanceof Timestamp ? doc.data().date.nanoseconds : null;
-          const formattedDate = new Date(timestampDate)
+
+          // Check if the date exists before trying to access the "toDate()" method
+          const timestampToDate = doc.data() && doc.data().date && date.toDate();
+
           return {
             id: doc.id,
             senderId,
             message,
-            date: formattedDate ? dayjs(formattedDate).toISOString() : null,
+            date: timestampToDate,
           }
         })
-
+ 
         if (dataMessages) {
           setMessages(dataMessages)
         }
@@ -74,7 +75,7 @@ export function Chat() {
     }
   }, [])
 
-  // Remove ActiveChat on press Back Button
+  // Clear ActiveChat on press Back Button
   useEffect(() => {
     const handleBackButton = () => {
       dispatch(setActiveChat(null));
