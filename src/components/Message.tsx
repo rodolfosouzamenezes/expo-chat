@@ -1,26 +1,22 @@
 import dayjs from "dayjs";
 import { StyleSheet, Text, View } from "react-native";
+import { IMessage } from "../features/chat.slice";
 import { useAppSelector } from "../store";
 
 interface MessageProps {
-  data: {
-    id: string;
-    uid: string;
-    date: string;
-    message: string;
-  }
+  data: IMessage
 }
 
-export function Message({ data: { id, message, uid, date } }: MessageProps) {
+export function Message({ data: { id, message, senderId, date } }: MessageProps) {
   const { user } = useAppSelector((state) => state.auth)
 
   return (
     <View
       style={[
         styles.messageArea,
-        user.uid === uid ? styles.senderMessage : styles.recipientMessage
+        user.uid === senderId ? styles.senderMessage : styles.recipientMessage
       ]}>
-      <Text style={user.uid === uid ? styles.senderText : styles.recipientText}>{message}</Text>
+      <Text style={user.uid === senderId ? styles.senderText : styles.recipientText}>{message}</Text>
       <Text style={styles.date}>{dayjs(date).format('HH:mm')}</Text>
     </View>
   )

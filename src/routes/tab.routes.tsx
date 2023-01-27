@@ -1,15 +1,20 @@
-import React from 'react'
-import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+import { getFocusedRouteNameFromRoute } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { Config } from '../screens/Config';
-import { Contacts } from '../screens/Contacts';
-import ChatStackRoutes from './chatStack.routes';
-import { getFocusedRouteNameFromRoute, useRoute } from '@react-navigation/native';
+import { Ionicons } from '@expo/vector-icons';
+import React from 'react'
+
 import { headerStyleTab } from '../styles/navigation';
+import { useAppSelector } from '../store';
+
+import ChatStackRoutes from './chatStack.routes';
+import { Contacts } from '../screens/Contacts';
+import { Config } from '../screens/Config';
 
 const { Screen, Navigator } = createBottomTabNavigator();
 
 const TabRoutes = () => {
+  const { chats } = useAppSelector((state) => state.chat)
+
   return (
     <Navigator
       initialRouteName='ChatList'
@@ -27,6 +32,7 @@ const TabRoutes = () => {
         name='ChatStack'
         component={ChatStackRoutes}
         options={({ route }) => {
+          // Hide tab bar in Chat screen
           const focusedRouteName = getFocusedRouteNameFromRoute(route)
 
           if (focusedRouteName === 'Chat') {
@@ -40,7 +46,7 @@ const TabRoutes = () => {
           
           return {
             headerShown: false,
-            tabBarBadge: 2,
+            tabBarBadge: chats.length,
             tabBarIcon: ({ focused, color }) => {
               return (
                 <Ionicons name='chatbox' size={focused ? 32 : 28} color={color} />

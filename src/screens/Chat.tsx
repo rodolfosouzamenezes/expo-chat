@@ -1,18 +1,80 @@
-import React, { useEffect } from "react";
-import { Text, StyleSheet, View, BackHandler, FlatList, TextInput, TouchableOpacity } from "react-native";
+import { addDoc, serverTimestamp, onSnapshot, orderBy, query, Timestamp, collection } from "firebase/firestore";
+import { StyleSheet, View, BackHandler, FlatList, TextInput, TouchableOpacity } from "react-native";
+import React, { useEffect, useLayoutEffect, useState } from "react";
 import { useNavigation } from "@react-navigation/native";
-import { useDispatch } from "react-redux";
 import { Ionicons } from '@expo/vector-icons';
+import { useDispatch } from "react-redux";
+import dayjs from "dayjs";
 
+import { IMessage, setActiveChat } from "../features/chat.slice";
 import { useAppSelector } from "../store";
-import { setActiveChat } from "../features/chat.slice";
+import { db } from "../config/firebase";
+
 import { Message } from "../components/Message";
+import { showToast } from "../features/toast.slice";
 
 export function Chat() {
-  const { activeChat } = useAppSelector((state) => state.chat)
-  const navigation = useNavigation();
-  const dispatch = useDispatch();  
+  const [messages, setMessages] = useState<IMessage[]>([])
+  const [textInput, setTextInput] = useState('')
 
+  const navigation = useNavigation();
+  const dispatch = useDispatch();
+
+  // Get states in redux
+  const {
+    chat: { activeChat },
+    auth: { user },
+  } = useAppSelector((state) => state);
+
+  const messageCollection = collection(db, 'chats', activeChat.id.toString(), 'messages');
+
+  const sendMessage = async () => {
+    // Return if is an empty message
+    if (textInput.trim().length === 0) return;
+
+    try {
+      // Add new message to collection
+      await addDoc(messageCollection, {
+        date: serverTimestamp(),
+        message: textInput,
+        senderId: user.uid
+      });
+      setTextInput('')
+    } catch (error) {
+      console.log(error);
+      dispatch(showToast({ message: 'Ops! Não foi possivel enviar a mensagem', type: 'error' }))
+    }
+  }
+
+  // Add listener for new message
+  useLayoutEffect(() => {
+    if (activeChat.id) {
+      const messagesSortedByDateRef = query(messageCollection, orderBy("date", "asc"))
+      const unsubscribe = onSnapshot(messagesSortedByDateRef, snapshot => {
+
+        // Format messageSnapshot to IMessage
+        const dataMessages: IMessage[] = snapshot.docs.map(doc => {
+          const { senderId, message, date } = doc.data();
+          const timestampDate = date instanceof Timestamp ? doc.data().date.nanoseconds : null;
+          const formattedDate = new Date(timestampDate)
+          return {
+            id: doc.id,
+            senderId,
+            message,
+            date: formattedDate ? dayjs(formattedDate).toISOString() : null,
+          }
+        })
+
+        if (dataMessages) {
+          setMessages(dataMessages)
+        }
+      })
+
+      return unsubscribe;
+    }
+  }, [])
+
+  // Remove ActiveChat on press Back Button
   useEffect(() => {
     const handleBackButton = () => {
       dispatch(setActiveChat(null));
@@ -31,20 +93,22 @@ export function Chat() {
   return (
     <View style={styles.container}>
       <FlatList
-        data={[
-          {id: '1', uid: '123', date: '2023-01-25T00:00:03.291Z',  message: 'Oiii' }, 
-          {id: '2', uid: '123', date: '2023-01-25T00:01:03.291Z', message: 'Tudo bemm?'},
-          {id: '3', uid: 'is6NWbciklRjtsneRB8JEV6AUhE2', date: '2023-01-25T00:04:03.291Z', message: 'oi'.repeat(50)},
-          {id: '4', uid: '123', date: '2023-01-25T01:06:03.291Z', message: 'oi'.repeat(50)},
-        ]}
+        data={messages}
+        contentContainerStyle={{ paddingBottom: 80 }}
         renderItem={({ item, index }) => <Message key={index} data={item} />}
         style={styles.chatArea}
       />
       <View style={styles.sendArea}>
         <TextInput
+          onChangeText={setTextInput}
+          value={textInput}
           style={styles.sendInput}
         />
-        <TouchableOpacity style={styles.sendButton} activeOpacity={0.7}>
+        <TouchableOpacity
+          onPress={sendMessage}
+          style={styles.sendButton}
+          activeOpacity={0.7}
+        >
           <Ionicons name="send" size={20} color="#fff" />
         </TouchableOpacity>
       </View>
@@ -58,7 +122,7 @@ const styles = StyleSheet.create({
   },
   chatArea: {
     flex: 1,
-    paddingTop: 20, 
+    paddingTop: 20,
   },
   sendArea: {
     height: 54,

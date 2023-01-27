@@ -15,7 +15,6 @@ export function Config() {
 
   const handleLogOut = () => {
     dispatch(logout())
-
     navigation.reset({
       index: 0,
       routes: [

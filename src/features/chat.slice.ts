@@ -11,6 +11,13 @@ export interface IChat {
   recipientId: string;
 }
 
+export interface IMessage {
+  id: string; 
+  senderId: string;
+  message: string;
+  date: string;
+}
+
 interface IChatState {
   chats: IChat[];
   contacts: IContact[];
