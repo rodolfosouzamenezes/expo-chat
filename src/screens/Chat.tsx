@@ -1,5 +1,5 @@
 import { addDoc, serverTimestamp, onSnapshot, orderBy, query, collection } from "firebase/firestore";
-import { StyleSheet, View, BackHandler, FlatList, TextInput, TouchableOpacity } from "react-native";
+import { StyleSheet, View, BackHandler, FlatList, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform, Text, ListRenderItemInfo } from "react-native";
 import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useNavigation } from "@react-navigation/native";
 import { Ionicons } from '@expo/vector-icons';
@@ -71,7 +71,7 @@ export function Chat() {
           setMessages(dataMessages)
 
           // Scroll the flat list to the top when you get a new message
-          flatListRef?.current.scrollToIndex({ index: 0 })
+          flatListRef?.current.scrollToIndex({ index: 0, animated: true })
         }
       })
 
@@ -105,7 +105,11 @@ export function Chat() {
         ref={flatListRef}
         style={styles.chatArea}
       />
-      <View style={styles.sendArea}>
+      <KeyboardAvoidingView
+        behavior={Platform.select({android: null, ios: 'padding'})}
+        keyboardVerticalOffset={Platform.select({android: null, ios: 64})}
+        style={styles.sendArea}
+      >
         <TextInput
           onChangeText={setTextInput}
           value={textInput}
@@ -118,7 +122,7 @@ export function Chat() {
         >
           <Ionicons name="send" size={20} color="#fff" />
         </TouchableOpacity>
-      </View>
+      </KeyboardAvoidingView>
     </View>
   )
 }
