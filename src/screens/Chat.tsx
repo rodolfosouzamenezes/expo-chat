@@ -1,21 +1,18 @@
-import { addDoc, serverTimestamp, onSnapshot, orderBy, query, collection } from "firebase/firestore";
-import { StyleSheet, View, BackHandler, FlatList } from "react-native";
-import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { addDoc, serverTimestamp, collection } from "firebase/firestore";
+import { StyleSheet, View, BackHandler } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { useDispatch } from "react-redux";
+import React, { useEffect } from "react";
 
-import { IMessage, setActiveChat } from "../features/chat.slice";
+import { setActiveChat } from "../features/chat.slice";
+import { showToast } from "../features/toast.slice";
 import { useAppSelector } from "../store";
 import { db } from "../config/firebase";
 
-import { Message } from "../components/Message";
-import { showToast } from "../features/toast.slice";
+import { MessageList } from "../components/MessageList";
 import { SendArea } from "../components/SendArea";
 
 export function Chat() {
-  const [messages, setMessages] = useState<IMessage[]>([])
-  const flatListRef = useRef<FlatList<IMessage>>(null);
-
   const navigation = useNavigation();
   const dispatch = useDispatch();
 
@@ -41,39 +38,6 @@ export function Chat() {
     }
   }
 
-  // Add listener for new message
-  useLayoutEffect(() => {
-    if (activeChat.id) {
-      const messagesSortedByDateRef = query(messageCollection, orderBy("date", "desc"))
-      const unsubscribe = onSnapshot(messagesSortedByDateRef, snapshot => {
-
-        // Format messageSnapshot to IMessage
-        const dataMessages: IMessage[] = snapshot.docs.map(doc => {
-          const { senderId, message, date } = doc.data();
-
-          // Check if the date exists before trying to access the "toDate()" method
-          const timestampToDate = doc.data() && doc.data().date && date.toDate();
-
-          return {
-            id: doc.id,
-            senderId,
-            message,
-            date: timestampToDate,
-          }
-        })
-
-        if (dataMessages) {
-          setMessages(dataMessages)
-
-          // Scroll the flat list to the top when you get a new message
-          flatListRef?.current.scrollToIndex({ index: 0, animated: true })
-        }
-      })
-
-      return unsubscribe;
-    }
-  }, [])
-
   // Clear ActiveChat on press Back Button
   useEffect(() => {
     const handleBackButton = () => {
@@ -92,14 +56,7 @@ export function Chat() {
 
   return (
     <View style={styles.container}>
-      <FlatList
-        data={messages}
-        contentContainerStyle={{ paddingBottom: 80 }}
-        renderItem={({ item, index }) => <Message key={index} data={item} />}
-        inverted
-        ref={flatListRef}
-        style={styles.chatArea}
-      />
+      <MessageList />
 
       <SendArea onSendMessage={handleSendMessage} />
     </View>
@@ -110,30 +67,4 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  chatArea: {
-    flex: 1,
-    paddingTop: 20,
-  },
-  sendArea: {
-    height: 54,
-    padding: 8,
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  sendInput: {
-    flex: 1,
-    height: 40,
-    padding: 10,
-    borderRadius: 100,
-    backgroundColor: '#CACACA',
-  },
-  sendButton: {
-    width: 46,
-    height: 46,
-    marginLeft: 8,
-    borderRadius: 100,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#0fa958'
-  }
 })

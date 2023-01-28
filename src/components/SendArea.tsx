@@ -41,10 +41,6 @@ export function SendArea({ onSendMessage }: SendAreaProps) {
 }
 
 const styles = StyleSheet.create({
-  chatArea: {
-    flex: 1,
-    paddingTop: 20,
-  },
   sendArea: {
     height: 54,
     padding: 8,
