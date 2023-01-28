@@ -1,8 +1,7 @@
 import { addDoc, serverTimestamp, onSnapshot, orderBy, query, collection } from "firebase/firestore";
-import { StyleSheet, View, BackHandler, FlatList, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform, Text, ListRenderItemInfo } from "react-native";
+import { StyleSheet, View, BackHandler, FlatList } from "react-native";
 import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useNavigation } from "@react-navigation/native";
-import { Ionicons } from '@expo/vector-icons';
 import { useDispatch } from "react-redux";
 
 import { IMessage, setActiveChat } from "../features/chat.slice";
@@ -11,10 +10,10 @@ import { db } from "../config/firebase";
 
 import { Message } from "../components/Message";
 import { showToast } from "../features/toast.slice";
+import { SendArea } from "../components/SendArea";
 
 export function Chat() {
   const [messages, setMessages] = useState<IMessage[]>([])
-  const [textInput, setTextInput] = useState('')
   const flatListRef = useRef<FlatList<IMessage>>(null);
 
   const navigation = useNavigation();
@@ -28,18 +27,14 @@ export function Chat() {
 
   const messageCollection = collection(db, 'chats', activeChat?.id.toString(), 'messages');
 
-  const sendMessage = async () => {
-    // Return if is an empty message
-    if (textInput.trim().length === 0) return;
-
+  const handleSendMessage = async (textMessage: string) => {
     try {
       // Add new message to collection
       await addDoc(messageCollection, {
         date: serverTimestamp(), // Get timestamp in firebase server
-        message: textInput,
+        message: textMessage,
         senderId: user.uid
       });
-      setTextInput('')
     } catch (error) {
       console.log(error);
       dispatch(showToast({ message: 'Ops! Não foi possivel enviar a mensagem', type: 'error' }))
@@ -105,24 +100,8 @@ export function Chat() {
         ref={flatListRef}
         style={styles.chatArea}
       />
-      <KeyboardAvoidingView
-        behavior={Platform.select({android: null, ios: 'padding'})}
-        keyboardVerticalOffset={Platform.select({android: null, ios: 64})}
-        style={styles.sendArea}
-      >
-        <TextInput
-          onChangeText={setTextInput}
-          value={textInput}
-          style={styles.sendInput}
-        />
-        <TouchableOpacity
-          onPress={sendMessage}
-          style={styles.sendButton}
-          activeOpacity={0.7}
-        >
-          <Ionicons name="send" size={20} color="#fff" />
-        </TouchableOpacity>
-      </KeyboardAvoidingView>
+
+      <SendArea onSendMessage={handleSendMessage} />
     </View>
   )
 }
