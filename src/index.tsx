@@ -2,6 +2,7 @@ import React from 'react';
 import { Provider } from 'react-redux';
 
 import { store } from './store';
+import './lib/dayjs'
 
 import Routes from './routes';
 import { Toast } from './components/Toast';
