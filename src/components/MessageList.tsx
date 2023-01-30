@@ -72,7 +72,9 @@ export function MessageList() {
           setMessages((dataMessages))
 
           // Scroll the flat list to the top when you get a new message
-          flatListRef?.current.scrollToIndex({ index: 0, animated: true })
+          if (dataMessages.length > 0) {
+            flatListRef?.current.scrollToIndex({ index: 0, animated: true })
+          }
         }
       })
 
