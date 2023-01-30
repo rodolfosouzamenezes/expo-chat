@@ -59,17 +59,17 @@ export function Contacts() {
 
         // Linking users with chat
         const usersRef = collection(db, "users")
-        const chats = [
+        const newChats = [
           { id: newChatId, title: contact.name, recipientId: contact.id }, 
           { id: newChatId, title: user.name, recipientId: user.uid }
         ]
 
         await Promise.all([
-          updateDoc(doc(usersRef, user.uid.toString()), { chats: arrayUnion(chats[0]) }),
-          updateDoc(doc(usersRef, contact.id.toString()), { chats: arrayUnion(chats[1]) }),
+          updateDoc(doc(usersRef, user.uid.toString()), { chats: arrayUnion(newChats[0]) }),
+          updateDoc(doc(usersRef, contact.id.toString()), { chats: arrayUnion(newChats[1]) }),
         ]);
 
-        chatWithThisUser = chats[0]
+        chatWithThisUser = newChats[0]
         dispatch(setChats([...chats, chatWithThisUser]))
       }
 
