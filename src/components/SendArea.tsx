@@ -3,17 +3,17 @@ import { Ionicons } from '@expo/vector-icons';
 import { useState } from "react";
 
 interface SendAreaProps {
-  onSendMessage: (textMessage: string) => Promise<void>;
+  onSendMessage: (type: string, messageContent?: string) => Promise<void>;
 }
 
 export function SendArea({ onSendMessage }: SendAreaProps) {
   const [textInput, setTextInput] = useState('')
 
-  const handleSendMessage = () => {
+  const handleSendMessage = async (type: 'text'| 'image') => {
     // Return if is an empty message
-    if (textInput.trim().length === 0) return;
+    if (textInput.trim().length === 0 && type === 'text') return;
 
-    onSendMessage(textInput)
+    await onSendMessage(type, textInput)
 
     setTextInput('')
   }
@@ -30,7 +30,14 @@ export function SendArea({ onSendMessage }: SendAreaProps) {
         style={styles.sendInput}
       />
       <TouchableOpacity
-        onPress={handleSendMessage}
+        onPress={() => handleSendMessage('image')}
+        style={styles.sendButton}
+        activeOpacity={0.7}
+      >
+        <Ionicons name="camera" size={20} color="#fff" />
+      </TouchableOpacity>
+      <TouchableOpacity
+        onPress={() => handleSendMessage('text')}
         style={styles.sendButton}
         activeOpacity={0.7}
       >

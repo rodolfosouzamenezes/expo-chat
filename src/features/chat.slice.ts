@@ -12,10 +12,12 @@ export interface IChat {
 }
 
 export interface IMessage {
-  id: string; 
+  type: 'text' | 'image';  
   senderId: string;
-  message: string;
+  text?: string;
   date: string;
+  src?: string;
+  id: string; 
 }
 
 interface IChatState {

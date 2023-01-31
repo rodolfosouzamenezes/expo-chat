@@ -52,18 +52,31 @@ export function MessageList() {
     if (activeChat.id) {
       const messagesSortedByDateRef = query(messageCollection, orderBy("date", "desc"))
       const unsubscribe = onSnapshot(messagesSortedByDateRef, snapshot => {
-
         // Format messageSnapshot to IMessage
         const dataMessages: IMessage[] = snapshot.docs.map(doc => {
-          const { senderId, message, date } = doc.data();
+          const { senderId, text, date, type } = doc.data();
 
           // Check if the date exists before trying to access the "toDate()" method
           const timestampToDate = doc.data() && doc.data().date && date.toDate();
 
+          if (type === 'image') {
+            const { src } = doc.data();
+
+            return {
+              id: doc.id,
+              senderId,
+              src,
+              text,
+              type,
+              date: timestampToDate,
+            }
+          }
+
           return {
             id: doc.id,
             senderId,
-            message,
+            text,
+            type,
             date: timestampToDate,
           }
         })
@@ -76,7 +89,7 @@ export function MessageList() {
             flatListRef?.current.scrollToIndex({ index: 0, animated: true })
           }
         }
-      })
+      })      
 
       return unsubscribe;
     }
@@ -87,7 +100,7 @@ export function MessageList() {
       data={groupMessageByDays(messages)}
       renderItem={({ item, index }) => {
         if (typeof item === 'object') {
-          return <Message key={index} data={item} />;
+          return <Message type={item.type} key={index} data={item} />;
         }
 
         if (item !== 'Invalid Date') {

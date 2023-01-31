@@ -21,6 +21,7 @@
     "dotenv": "^16.0.3",
     "expo": "~47.0.12",
     "expo-constants": "~14.0.2",
+    "expo-image-picker": "~14.0.2",
     "expo-splash-screen": "~0.17.5",
     "expo-status-bar": "~1.4.2",
     "firebase": "^9.15.0",
