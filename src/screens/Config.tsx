@@ -6,10 +6,9 @@ import { useDispatch } from "react-redux";
 import { useAppSelector } from "../store";
 import { Button } from "../components/Button";
 import { logout } from "../features/auth.slice";
-import { showToast } from "../features/toast.slice";
 
 export function Config() {
-  const { isLogged, user } = useAppSelector((state) => state.auth)
+  const { user } = useAppSelector((state) => state.auth)
   const navigation = useNavigation();
   const dispatch = useDispatch();
 
@@ -30,6 +29,9 @@ export function Config() {
         <Text style={styles.title}>Email: {user.email}</Text>
         <Text style={styles.title} numberOfLines={1} ellipsizeMode='tail'>UID: {user.uid}</Text>
       </View>
+
+      <Text>IMAGEM DE PERFIL</Text>
+
       <Button title="Sair" onPress={handleLogOut} />
     </View>
   )
